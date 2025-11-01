@@ -49,7 +49,7 @@ const Admin = () => {
         .from('orders')
         .select('total');
       
-      const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total), 0) || 0;
+      const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
 
       // Get products count
       const { count: productsCount } = await supabase
