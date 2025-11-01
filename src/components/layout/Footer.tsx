@@ -1,116 +1,71 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { MapPin, Phone, Mail } from "lucide-react";
 
 const Footer = () => {
+  const { t } = useTranslation();
+  
   return (
-    <footer className="bg-muted/30 border-t mt-16">
+    <footer className="bg-muted/50 border-t mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-primary">StepUp</h3>
+          <div>
+            <h3 className="text-lg font-bold mb-4">StepUp Shoes</h3>
             <p className="text-sm text-muted-foreground">
-              Крупнейший онлайн-магазин обуви в Казахстане. Качество, комфорт и стиль с 2010 года.
+              {t('about.description')}
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
-                <Youtube className="h-5 w-5" />
-              </a>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold mb-4">{t('footer.about')}</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/about" className="text-muted-foreground hover:text-primary transition-smooth">{t('footer.about')}</Link></li>
+              <li><Link to="/delivery" className="text-muted-foreground hover:text-primary transition-smooth">{t('footer.delivery')}</Link></li>
+              <li><Link to="/returns" className="text-muted-foreground hover:text-primary transition-smooth">{t('footer.returns')}</Link></li>
+              <li><Link to="/faq" className="text-muted-foreground hover:text-primary transition-smooth">{t('footer.faq')}</Link></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold mb-4">{t('footer.contact')}</h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <p className="text-muted-foreground">{t('footer.address')}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                <a href="tel:+77762675957" className="text-muted-foreground hover:text-primary transition-smooth">
+                  {t('footer.phone')}
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+                <a href="mailto:tanirbergenibrahim44@gmail.com" className="text-muted-foreground hover:text-primary transition-smooth">
+                  {t('footer.email')}
+                </a>
+              </div>
             </div>
           </div>
-
-          {/* Quick Links */}
+          
           <div>
-            <h4 className="font-semibold mb-4">Покупателям</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-smooth">
-                  О компании
-                </Link>
-              </li>
-              <li>
-                <Link to="/delivery" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Доставка и оплата
-                </Link>
-              </li>
-              <li>
-                <Link to="/returns" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Возврат и обмен
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-smooth">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h4 className="font-semibold mb-4">Категории</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/catalog?category=men" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Мужская обувь
-                </Link>
-              </li>
-              <li>
-                <Link to="/catalog?category=women" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Женская обувь
-                </Link>
-              </li>
-              <li>
-                <Link to="/catalog?category=kids" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Детская обувь
-                </Link>
-              </li>
-              <li>
-                <Link to="/catalog?sale=true" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Распродажа
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="font-semibold mb-4">Контакты</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <strong className="text-foreground">Телефон:</strong>
-                <br />
-                <a href="tel:+77001234567" className="hover:text-primary transition-smooth">
-                  +7 (700) 123-45-67
-                </a>
-              </li>
-              <li>
-                <strong className="text-foreground">Email:</strong>
-                <br />
-                <a href="mailto:info@stepup.kz" className="hover:text-primary transition-smooth">
-                  info@stepup.kz
-                </a>
-              </li>
-              <li>
-                <strong className="text-foreground">Адрес:</strong>
-                <br />
-                г. Алматы, ул. Абая 150
-              </li>
-            </ul>
+            <h4 className="font-semibold mb-4">StepUp Shoes</h4>
+            <div className="space-y-2 text-sm">
+              <Link to="/catalog" className="block text-muted-foreground hover:text-primary transition-smooth">
+                {t('nav.catalog')}
+              </Link>
+              <Link to="/catalog?category=men" className="block text-muted-foreground hover:text-primary transition-smooth">
+                {t('nav.men')}
+              </Link>
+              <Link to="/catalog?category=women" className="block text-muted-foreground hover:text-primary transition-smooth">
+                {t('nav.women')}
+              </Link>
+            </div>
           </div>
         </div>
-
+        
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} StepUp. Все права защищены.</p>
+          <p>{t('footer.rights')}</p>
         </div>
       </div>
     </footer>

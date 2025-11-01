@@ -1,0 +1,58 @@
+{
+  "nav": {
+    "catalog": "Catalog",
+    "men": "Men",
+    "women": "Women",
+    "sale": "Sale",
+    "login": "Login",
+    "account": "My Account",
+    "logout": "Logout",
+    "search": "Search shoes..."
+  },
+  "footer": {
+    "about": "About Us",
+    "delivery": "Delivery",
+    "returns": "Returns",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "address": "Zhetysu State University, I. 187a, Ilyas Zhansugurov St., Taldykorgan",
+    "phone": "+7 (776) 267-59-57",
+    "email": "tanirbergenibrahim44@gmail.com",
+    "rights": "© 2025 StepUp Shoes. All rights reserved."
+  },
+  "about": {
+    "title": "About StepUp Shoes",
+    "description": "StepUp Shoes is a modern store for stylish footwear that combines comfort and quality.",
+    "text1": "We offer a wide selection of shoes for men, women, and children from leading global brands.",
+    "text2": "Our goal is to make shoe shopping convenient and enjoyable by providing the best service and reliable delivery."
+  },
+  "delivery": {
+    "title": "Delivery",
+    "text1": "Delivery across Kazakhstan within 2-5 business days.",
+    "text2": "Courier delivery or pickup from collection points.",
+    "text3": "Free delivery on orders over 20,000 ₸.",
+    "text4": "Express delivery available (1 day, for an additional fee).",
+    "text5": "After placing your order, you will receive an SMS and email with a tracking number."
+  },
+  "returns": {
+    "title": "Returns and Exchanges",
+    "text1": "Returns are possible within 14 days of receipt.",
+    "text2": "Items must be in original packaging with no signs of wear.",
+    "text3": "Refunds are issued using the same payment method.",
+    "text4": "To process a return, contact us by email:",
+    "email": "tanirbergenibrahim44@gmail.com"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "How to choose a size?",
+    "a1": "Each product page has a size chart.",
+    "q2": "Can I pay on delivery?",
+    "a2": "Yes, cash on delivery is available for some regions.",
+    "q3": "How to track my order?",
+    "a3": "Order status and tracking number are displayed in your account.",
+    "q4": "What if the item doesn't fit?",
+    "a4": "You can arrange a return or exchange through the Returns page.",
+    "q5": "Is delivery available outside Kazakhstan?",
+    "a5": "Currently only within Kazakhstan, but we plan to expand internationally."
+  }
+}
