@@ -7,6 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, ShoppingBag, Users, DollarSign } from "lucide-react";
+import OrdersManagement from "@/components/admin/OrdersManagement";
+import ProductsManagement from "@/components/admin/ProductsManagement";
+import UsersManagement from "@/components/admin/UsersManagement";
+import SalesChart from "@/components/admin/SalesChart";
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -138,6 +142,9 @@ const Admin = () => {
           </Card>
         </div>
 
+        {/* Sales Chart */}
+        <SalesChart />
+
         {/* Admin Tabs */}
         <Tabs defaultValue="orders" className="space-y-6">
           <TabsList>
@@ -147,30 +154,15 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="orders">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Последние заказы</h2>
-              <p className="text-muted-foreground">
-                Здесь будет список всех заказов с возможностью управления статусами
-              </p>
-            </Card>
+            <OrdersManagement />
           </TabsContent>
 
           <TabsContent value="products">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Управление товарами</h2>
-              <p className="text-muted-foreground">
-                Здесь будет возможность добавлять, редактировать и удалять товары
-              </p>
-            </Card>
+            <ProductsManagement />
           </TabsContent>
 
           <TabsContent value="users">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Управление пользователями</h2>
-              <p className="text-muted-foreground">
-                Здесь будет список пользователей и управление ролями
-              </p>
-            </Card>
+            <UsersManagement />
           </TabsContent>
         </Tabs>
       </main>

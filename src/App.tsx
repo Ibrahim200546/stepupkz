@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { CartProvider } from "./hooks/useCart";
+import SEOHead from "./components/SEOHead";
 import "./i18n";
 import Index from "./pages/Index";
 import Catalog from "./pages/Catalog";
@@ -28,6 +29,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SEOHead />
         <AuthProvider>
           <CartProvider>
             <Routes>
