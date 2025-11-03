@@ -7,6 +7,7 @@ import Dashboard from "@/components/admin/Dashboard";
 import OrdersManagement from "@/components/admin/OrdersManagement";
 import ProductsManagement from "@/components/admin/ProductsManagement";
 import UsersManagement from "@/components/admin/UsersManagement";
+import ChatsManagement from "@/components/admin/ChatsManagement";
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -50,6 +51,7 @@ const Admin = () => {
         <Route path="orders" element={<OrdersManagement />} />
         <Route path="products" element={<ProductsManagement />} />
         <Route path="users" element={<UsersManagement />} />
+        <Route path="chats" element={<ChatsManagement />} />
         <Route path="analytics" element={<Dashboard />} />
         <Route path="settings" element={<div>Настройки (в разработке)</div>} />
       </Routes>

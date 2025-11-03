@@ -1,4 +1,4 @@
-import { ShoppingCart, Search, User, Menu, LogOut } from "lucide-react";
+import { ShoppingCart, Search, User, Menu, LogOut, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -60,6 +60,12 @@ const Navbar = () => {
           <div className="flex items-center space-x-2">
             <ThemeToggle />
             <LanguageSwitcher />
+            
+            <Button variant="ghost" size="icon" asChild className="hidden md:flex">
+              <Link to="/chat">
+                <MessageSquare className="h-5 w-5" />
+              </Link>
+            </Button>
             
             {user ? (
               <DropdownMenu>
