@@ -20,6 +20,8 @@ const Auth = () => {
   const [signupForm, setSignupForm] = useState({
     firstName: '',
     lastName: '',
+    nickname: '',
+    phone: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -54,7 +56,9 @@ const Auth = () => {
         signupForm.email, 
         signupForm.password,
         signupForm.firstName,
-        signupForm.lastName
+        signupForm.lastName,
+        signupForm.nickname,
+        signupForm.phone
       );
     } finally {
       setLoading(false);
@@ -125,6 +129,26 @@ const Auth = () => {
                       onChange={(e) => setSignupForm({...signupForm, lastName: e.target.value})}
                     />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="nickname">@Nickname (уникальный)</Label>
+                  <Input 
+                    id="nickname" 
+                    required
+                    placeholder="ibrahim"
+                    value={signupForm.nickname}
+                    onChange={(e) => setSignupForm({...signupForm, nickname: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Телефон (опционально)</Label>
+                  <Input 
+                    id="phone" 
+                    type="tel"
+                    placeholder="+7 (777) 123-45-67"
+                    value={signupForm.phone}
+                    onChange={(e) => setSignupForm({...signupForm, phone: e.target.value})}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="signup-email">Email</Label>

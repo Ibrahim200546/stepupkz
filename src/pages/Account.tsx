@@ -5,14 +5,26 @@ import Footer from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, User, Heart } from "lucide-react";
+import { Package, User, Heart, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 
 const Account = () => {
   const { user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [editForm, setEditForm] = useState({
+    first_name: '',
+    last_name: '',
+    nickname: '',
+    phone: '',
+  });
 
   useEffect(() => {
     if (user) {
@@ -20,6 +32,17 @@ const Account = () => {
       loadOrders();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (profile) {
+      setEditForm({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        nickname: profile.nickname || '',
+        phone: profile.phone || '',
+      });
+    }
+  }, [profile]);
 
   const loadProfile = async () => {
     try {
@@ -58,6 +81,35 @@ const Account = () => {
     } catch (error) {
       console.error('Error loading orders:', error);
     }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: editForm.first_name,
+          last_name: editForm.last_name,
+          nickname: editForm.nickname.toLowerCase(),
+          phone: editForm.phone,
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      
+      toast.success('Профиль обновлён');
+      setEditMode(false);
+      loadProfile();
+    } catch (error: any) {
+      toast.error(error.message || 'Ошибка сохранения');
+    }
+  };
+
+  const copyNickname = () => {
+    navigator.clipboard.writeText(`@${profile?.nickname}`);
+    setCopied(true);
+    toast.success('Никнейм скопирован');
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (authLoading) {
@@ -175,25 +227,91 @@ const Account = () => {
 
           <TabsContent value="profile">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Личные данные</h2>
-              <div className="space-y-4">
-                <div>
-                  <span className="text-sm text-muted-foreground">Email</span>
-                  <p className="font-medium">{user.email}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Имя</span>
-                  <p className="font-medium">{profile?.first_name || 'Не указано'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Фамилия</span>
-                  <p className="font-medium">{profile?.last_name || 'Не указано'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Телефон</span>
-                  <p className="font-medium">{profile?.phone || 'Не указано'}</p>
-                </div>
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-xl font-semibold">Личные данные</h2>
+                {!editMode && (
+                  <Button onClick={() => setEditMode(true)} variant="outline">
+                    Редактировать
+                  </Button>
+                )}
               </div>
+
+              {editMode ? (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="first_name">Имя</Label>
+                    <Input 
+                      id="first_name"
+                      value={editForm.first_name}
+                      onChange={(e) => setEditForm({...editForm, first_name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="last_name">Фамилия</Label>
+                    <Input 
+                      id="last_name"
+                      value={editForm.last_name}
+                      onChange={(e) => setEditForm({...editForm, last_name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="nickname">@Nickname</Label>
+                    <Input 
+                      id="nickname"
+                      value={editForm.nickname}
+                      onChange={(e) => setEditForm({...editForm, nickname: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Телефон</Label>
+                    <Input 
+                      id="phone"
+                      type="tel"
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={handleSaveProfile}>Сохранить</Button>
+                    <Button onClick={() => setEditMode(false)} variant="outline">Отмена</Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-sm text-muted-foreground">Email</span>
+                    <p className="font-medium">{user.email}</p>
+                  </div>
+                  {profile?.nickname && (
+                    <div>
+                      <span className="text-sm text-muted-foreground">Nickname</span>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">@{profile.nickname}</p>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={copyNickname}
+                          className="h-8 w-8 p-0"
+                        >
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-sm text-muted-foreground">Имя</span>
+                    <p className="font-medium">{profile?.first_name || 'Не указано'}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Фамилия</span>
+                    <p className="font-medium">{profile?.last_name || 'Не указано'}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Телефон</span>
+                    <p className="font-medium">{profile?.phone || 'Не указано'}</p>
+                  </div>
+                </div>
+              )}
             </Card>
           </TabsContent>
 

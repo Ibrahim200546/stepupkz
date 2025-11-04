@@ -584,6 +584,8 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          nickname: string | null
+          nickname_updated_at: string | null
           phone: string | null
           updated_at: string | null
         }
@@ -593,6 +595,8 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          nickname?: string | null
+          nickname_updated_at?: string | null
           phone?: string | null
           updated_at?: string | null
         }
@@ -602,6 +606,8 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          nickname?: string | null
+          nickname_updated_at?: string | null
           phone?: string | null
           updated_at?: string | null
         }
@@ -693,6 +699,102 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_products: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          name: string
+          price: number
+          stock: number | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          name: string
+          price: number
+          stock?: number | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          stock?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          logo: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       wishlist: {
         Row: {
           created_at: string | null
@@ -740,7 +842,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "customer" | "manager" | "admin"
+      app_role: "customer" | "manager" | "admin" | "vendor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -868,7 +970,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["customer", "manager", "admin"],
+      app_role: ["customer", "manager", "admin", "vendor"],
     },
   },
 } as const

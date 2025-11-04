@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +8,7 @@ import { Search, Plus, Users } from 'lucide-react';
 import { Chat } from '@/hooks/useChat';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChatListProps {
   chats: Chat[];
@@ -18,6 +19,30 @@ interface ChatListProps {
 
 export const ChatList = ({ chats, selectedChatId, onSelectChat, onNewChat }: ChatListProps) => {
   const [search, setSearch] = useState('');
+  const [chatMembers, setChatMembers] = useState<Record<string, any[]>>({});
+
+  useEffect(() => {
+    loadChatMembers();
+  }, [chats]);
+
+  const loadChatMembers = async () => {
+    const members: Record<string, any[]> = {};
+    
+    for (const chat of chats) {
+      if (chat.type === 'direct') {
+        const { data } = await supabase
+          .from('chat_members')
+          .select('user_id, profiles(first_name, last_name, nickname, avatar_url)')
+          .eq('chat_id', chat.id);
+        
+        if (data) {
+          members[chat.id] = data;
+        }
+      }
+    }
+    
+    setChatMembers(members);
+  };
 
   const filteredChats = chats.filter(chat => {
     const searchLower = search.toLowerCase();
@@ -31,6 +56,16 @@ export const ChatList = ({ chats, selectedChatId, onSelectChat, onNewChat }: Cha
     if (chat.type === 'group') {
       return chat.title || 'Группа';
     }
+    
+    // For direct chats, show the other user's name
+    const members = chatMembers[chat.id] || [];
+    const otherMember = members.find((m: any) => m.user_id !== supabase.auth.getUser());
+    if (otherMember && otherMember.profiles) {
+      const profile = Array.isArray(otherMember.profiles) ? otherMember.profiles[0] : otherMember.profiles;
+      if (profile.nickname) return `@${profile.nickname}`;
+      if (profile.first_name) return `${profile.first_name} ${profile.last_name || ''}`.trim();
+    }
+    
     return 'Личный чат';
   };
 
