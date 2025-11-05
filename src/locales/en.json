@@ -54,5 +54,64 @@
     "a4": "You can arrange a return or exchange through the Returns page.",
     "q5": "Is delivery available outside Kazakhstan?",
     "a5": "Currently only within Kazakhstan, but we plan to expand internationally."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "Privacy policy for StepUp Shoes website",
+    "lastUpdated": "Last updated",
+    "section1": {
+      "title": "Information We Collect",
+      "text": "We collect personal information that you provide when registering, placing orders, or communicating with us. This includes your name, email address, phone number, delivery address, and payment information."
+    },
+    "section2": {
+      "title": "How We Use Your Information",
+      "item1": "Processing and fulfilling your orders",
+      "item2": "Communicating about your orders and our services",
+      "item3": "Improving our website and services",
+      "item4": "Marketing communications (with your consent)"
+    },
+    "section3": {
+      "title": "Data Protection",
+      "text": "We implement appropriate security measures to protect your personal information. Your payment data is processed securely through trusted payment providers."
+    },
+    "section4": {
+      "title": "Cookies",
+      "text": "We use cookies to improve your browsing experience and analyze website traffic. You can control cookie settings in your browser."
+    },
+    "section5": {
+      "title": "Contact Us",
+      "text": "If you have questions about our privacy policy, please contact us:"
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "description": "Terms of service for StepUp Shoes website",
+    "lastUpdated": "Last updated",
+    "section1": {
+      "title": "General Provisions",
+      "text": "By using our website and services, you agree to these terms. Please read them carefully before making a purchase."
+    },
+    "section2": {
+      "title": "Orders and Payment",
+      "text": "All prices are in KZT and include VAT. Payment can be made by card or cash on delivery (where available). Orders are confirmed after payment is received."
+    },
+    "section3": {
+      "title": "Delivery",
+      "item1": "Delivery takes 2-5 business days within Kazakhstan",
+      "item2": "Shipping costs depend on your location and order total",
+      "item3": "Free delivery on orders over 20,000 ₸"
+    },
+    "section4": {
+      "title": "Returns and Refunds",
+      "text": "You can return items within 14 days of receipt. Items must be unworn and in original packaging. Refunds are processed using the original payment method."
+    },
+    "section5": {
+      "title": "Liability",
+      "text": "We are not responsible for delays caused by courier services or force majeure circumstances."
+    },
+    "section6": {
+      "title": "Contact Information",
+      "text": "For questions about these terms, contact us:"
+    }
   }
 }

@@ -21,6 +21,10 @@ import Returns from "./pages/Returns";
 import FAQ from "./pages/FAQ";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import VendorRegister from "./pages/VendorRegister";
+import VendorProducts from "./pages/VendorProducts";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +51,10 @@ const App = () => (
               <Route path="/returns" element={<Returns />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/vendor/register" element={<VendorRegister />} />
+              <Route path="/vendor/products" element={<VendorProducts />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

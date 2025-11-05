@@ -1,4 +1,4 @@
-import { ShoppingCart, Search, User, Menu, LogOut, MessageSquare } from "lucide-react";
+import { ShoppingCart, Search, User, Menu, LogOut, MessageSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -7,17 +7,20 @@ import { useCart } from "@/hooks/useCart";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const { cartCount } = useCart();
   const { t } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -101,9 +104,87 @@ const Navbar = () => {
               </Link>
             </Button>
 
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col space-y-4 mt-6">
+                  <Link 
+                    to="/catalog" 
+                    className="text-lg font-medium hover:text-primary transition-smooth"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t('nav.catalog')}
+                  </Link>
+                  <Link 
+                    to="/catalog?category=men" 
+                    className="text-lg font-medium hover:text-primary transition-smooth"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t('nav.men')}
+                  </Link>
+                  <Link 
+                    to="/catalog?category=women" 
+                    className="text-lg font-medium hover:text-primary transition-smooth"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t('nav.women')}
+                  </Link>
+                  <Link 
+                    to="/catalog?sale=true" 
+                    className="text-lg font-medium text-secondary hover:text-secondary-hover transition-smooth"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t('nav.sale')}
+                  </Link>
+                  <hr className="my-2" />
+                  <Link 
+                    to="/chat" 
+                    className="text-lg font-medium hover:text-primary transition-smooth flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    Chat
+                  </Link>
+                  {user ? (
+                    <>
+                      <Link 
+                        to="/account" 
+                        className="text-lg font-medium hover:text-primary transition-smooth flex items-center gap-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5" />
+                        {t('nav.account')}
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          signOut();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="text-lg font-medium hover:text-primary transition-smooth flex items-center gap-2 text-left"
+                      >
+                        <LogOut className="h-5 w-5" />
+                        {t('nav.logout')}
+                      </button>
+                    </>
+                  ) : (
+                    <Link 
+                      to="/auth" 
+                      className="text-lg font-medium hover:text-primary transition-smooth"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('nav.login')}
+                    </Link>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
