@@ -5,13 +5,15 @@ import { useChat } from '@/hooks/useChat';
 import { ChatList } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { NewChatDialog } from '@/components/chat/NewChatDialog';
+import { OnlineUsers } from '@/components/chat/OnlineUsers';
 import Navbar from '@/components/layout/Navbar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageSquare } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MessageSquare, Users } from 'lucide-react';
 
 const Chat = () => {
   const { user, loading: authLoading } = useAuth();
-  const { chats, loading: chatsLoading } = useChat();
+  const { chats, loading: chatsLoading, createDirectChat } = useChat();
   const navigate = useNavigate();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
@@ -33,6 +35,15 @@ const Chat = () => {
     return null;
   }
 
+  const handleStartChat = async (userId: string) => {
+    try {
+      const chatId = await createDirectChat(userId);
+      setSelectedChatId(chatId);
+    } catch (error) {
+      console.error('Error starting chat:', error);
+    }
+  };
+
   const showChatList = !isMobile || !selectedChatId;
   const showChatWindow = !isMobile || selectedChatId;
 
@@ -44,15 +55,34 @@ const Chat = () => {
         <div className="h-[calc(100vh-140px)] bg-card rounded-lg shadow-lg overflow-hidden">
           <div className="grid md:grid-cols-[350px,1fr] h-full">
             {showChatList && (
-              <div className={`${selectedChatId && isMobile ? 'hidden' : 'block'}`}>
-                <ChatList
-                  chats={chats}
-                  selectedChatId={selectedChatId || undefined}
-                  onSelectChat={(chatId) => {
-                    setSelectedChatId(chatId);
-                  }}
-                  onNewChat={() => setShowNewChat(true)}
-                />
+              <div className={`${selectedChatId && isMobile ? 'hidden' : 'block'} border-r`}>
+                <Tabs defaultValue="chats" className="h-full flex flex-col">
+                  <TabsList className="w-full rounded-none border-b">
+                    <TabsTrigger value="chats" className="flex-1">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Чаты
+                    </TabsTrigger>
+                    <TabsTrigger value="online" className="flex-1">
+                      <Users className="h-4 w-4 mr-2" />
+                      Онлайн
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="chats" className="flex-1 m-0">
+                    <ChatList
+                      chats={chats}
+                      selectedChatId={selectedChatId || undefined}
+                      onSelectChat={(chatId) => {
+                        setSelectedChatId(chatId);
+                      }}
+                      onNewChat={() => setShowNewChat(true)}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="online" className="flex-1 m-0">
+                    <OnlineUsers onStartChat={handleStartChat} />
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
 
