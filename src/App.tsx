@@ -20,6 +20,7 @@ import Delivery from "./pages/Delivery";
 import Returns from "./pages/Returns";
 import FAQ from "./pages/FAQ";
 import Chat from "./pages/Chat";
+import VendorDashboard from "./pages/VendorDashboard";
 import NotFound from "./pages/NotFound";
 import ChatBot from "./components/chatbot/ChatBot";
 
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/account" element={<Account />} />
+              <Route path="/vendor/dashboard" element={<VendorDashboard />} />
               <Route path="/admin/*" element={<Admin />} />
               <Route path="/about" element={<About />} />
               <Route path="/delivery" element={<Delivery />} />

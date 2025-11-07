@@ -17,14 +17,24 @@ const ProductCard = ({ id, name, brand, price, oldPrice, image, inStock }: Produ
   const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
   return (
-    <Card className="group relative overflow-hidden border bg-card hover:shadow-card-hover transition-smooth">
-      <Link to={`/product/${id}`} className="block">
+    <Card className="group relative overflow-hidden border bg-card hover:shadow-card-hover transition-smooth hover:scale-[1.02] h-full flex flex-col">
+      <Link to={`/product/${id}`} className="block flex-1 flex flex-col">
         {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden bg-muted">
+        <div className="relative aspect-square overflow-hidden bg-muted rounded-t-xl">
           <img 
-            src={image} 
+            src={image || '/placeholder.svg'} 
             alt={name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+            className="h-full w-full object-cover transition-all duration-300 group-hover:scale-105 animate-in fade-in duration-500"
+            style={{
+              objectFit: 'cover',
+              borderRadius: '12px 12px 0 0',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder.svg';
+            }}
           />
           
           {/* Discount Badge */}

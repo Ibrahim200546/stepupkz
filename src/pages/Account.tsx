@@ -1,25 +1,50 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, User, Heart } from "lucide-react";
+import { Package, User, Heart, Store } from "lucide-react";
+import RegisterVendorDialog from "@/components/vendor/RegisterVendorDialog";
 
 const Account = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [vendor, setVendor] = useState<any>(null);
+  const [isVendor, setIsVendor] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadProfile();
       loadOrders();
+      checkVendorStatus();
     }
   }, [user]);
+
+  const checkVendorStatus = async () => {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('vendors')
+        .select('*')
+        .eq('owner_id', user?.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setVendor(data);
+        setIsVendor(true);
+      }
+    } catch (error) {
+      console.error('Error checking vendor status:', error);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -173,7 +198,7 @@ const Account = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Личные данные</h2>
               <div className="space-y-4">
@@ -194,6 +219,57 @@ const Account = () => {
                   <p className="font-medium">{profile?.phone || 'Не указано'}</p>
                 </div>
               </div>
+            </Card>
+
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Store className="h-5 w-5" />
+                Мой магазин
+              </h2>
+              
+              {isVendor ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      {vendor?.logo && (
+                        <img 
+                          src={vendor.logo} 
+                          alt={vendor.name}
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-lg">{vendor?.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {vendor?.verified ? "✓ Проверен" : "Ожидает проверки"}
+                        </p>
+                      </div>
+                    </div>
+                    {vendor?.description && (
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {vendor.description}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <Button 
+                    variant="default" 
+                    size="lg" 
+                    className="w-full"
+                    onClick={() => navigate('/vendor/dashboard')}
+                  >
+                    <Store className="mr-2 h-5 w-5" />
+                    Войти в магазин
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Зарегистрируйте свой магазин и начните продавать товары на StepUp Shoes
+                  </p>
+                  <RegisterVendorDialog onSuccess={checkVendorStatus} />
+                </div>
+              )}
             </Card>
           </TabsContent>
 
