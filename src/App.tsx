@@ -21,7 +21,6 @@ import Returns from "./pages/Returns";
 import FAQ from "./pages/FAQ";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
-import ChatBot from "./components/chatbot/ChatBot";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +50,6 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <ChatBot />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
