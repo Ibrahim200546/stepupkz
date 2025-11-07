@@ -15,12 +15,12 @@ serve(async (req) => {
   try {
     const { message, conversationHistory } = await req.json();
     
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Calling OpenAI API with message:', message);
+    console.log('Calling Lovable AI with message:', message);
 
     const messages = [
       { 
@@ -31,14 +31,14 @@ serve(async (req) => {
       { role: 'user', content: message }
     ];
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: messages,
         max_tokens: 500,
         temperature: 0.7,
@@ -47,14 +47,22 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('Lovable AI error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        throw new Error('Rate limits exceeded, please try again later.');
+      }
+      if (response.status === 402) {
+        throw new Error('Payment required, please add funds to your Lovable AI workspace.');
+      }
+      
+      throw new Error(`Lovable AI error: ${response.status}`);
     }
 
     const data = await response.json();
     const botMessage = data.choices[0].message.content;
 
-    console.log('OpenAI response:', botMessage);
+    console.log('Lovable AI response:', botMessage);
 
     return new Response(JSON.stringify({ message: botMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
