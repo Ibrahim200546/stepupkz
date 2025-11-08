@@ -21,6 +21,7 @@ import Returns from "./pages/Returns";
 import FAQ from "./pages/FAQ";
 import Chat from "./pages/Chat";
 import VendorDashboard from "./pages/VendorDashboard";
+import VendorStore from "./pages/VendorStore";
 import NotFound from "./pages/NotFound";
 import ChatBot from "./components/chatbot/ChatBot";
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/account" element={<Account />} />
               <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+              <Route path="/vendor/:vendorId" element={<VendorStore />} />
               <Route path="/admin/*" element={<Admin />} />
               <Route path="/about" element={<About />} />
               <Route path="/delivery" element={<Delivery />} />
