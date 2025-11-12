@@ -9,17 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, User, Heart, Copy, Check } from "lucide-react";
+import { Package, User, Heart, Copy, Check, Shield } from "lucide-react";
 import { toast } from "sonner";
 import type { Order, Profile } from "@/types/database";
+import { AdminPasswordDialog } from "@/components/admin/AdminPasswordDialog";
 
 const Account = () => {
   const { user, loading: authLoading } = useAuth();
+  const { hasAdminAccess, isAdmin, isManager, loading: rolesLoading } = useAdminCheck();
   const [orders, setOrders] = useState<Order[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showAdminPasswordDialog, setShowAdminPasswordDialog] = useState(false);
   const [editForm, setEditForm] = useState({
     first_name: '',
     last_name: '',
@@ -230,7 +234,49 @@ const Account = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="space-y-6">
+            {/* Debug Info - Remove in production */}
+            {import.meta.env.DEV && (
+              <Card className="p-4 bg-yellow-50 border-yellow-200">
+                <h4 className="font-semibold text-sm mb-2">🐛 Debug Info:</h4>
+                <div className="text-xs space-y-1 font-mono">
+                  <p>hasAdminAccess: {String(hasAdminAccess)}</p>
+                  <p>isAdmin: {String(isAdmin)}</p>
+                  <p>isManager: {String(isManager)}</p>
+                  <p>rolesLoading: {String(rolesLoading)}</p>
+                  <p>User ID: {user?.id}</p>
+                </div>
+              </Card>
+            )}
+
+            {/* Admin Access Card */}
+            {hasAdminAccess && !rolesLoading && (
+              <Card className="p-6 border-primary/50 bg-primary/5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Shield className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Админ панель</h3>
+                      <p className="text-sm text-muted-foreground">
+                        У вас есть доступ к админ панели
+                        {isAdmin && " (Администратор)"}
+                        {isManager && !isAdmin && " (Менеджер)"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => setShowAdminPasswordDialog(true)}
+                    className="gap-2"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Открыть админ панель
+                  </Button>
+                </div>
+              </Card>
+            )}
+
             <Card className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-semibold">Личные данные</h2>
@@ -330,6 +376,12 @@ const Account = () => {
       </main>
 
       <Footer />
+      
+      {/* Admin Password Dialog */}
+      <AdminPasswordDialog 
+        open={showAdminPasswordDialog}
+        onOpenChange={setShowAdminPasswordDialog}
+      />
     </div>
   );
 };

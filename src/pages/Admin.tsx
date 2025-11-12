@@ -15,6 +15,26 @@ const Admin = () => {
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [checkingRole, setCheckingRole] = useState(true);
+  const [passwordVerified, setPasswordVerified] = useState(false);
+
+  useEffect(() => {
+    // Проверить верификацию пароля из sessionStorage
+    const verified = sessionStorage.getItem('admin_verified');
+    const verifiedAt = sessionStorage.getItem('admin_verified_at');
+    
+    if (verified === 'true' && verifiedAt) {
+      const verifiedTime = parseInt(verifiedAt);
+      // Верификация действует 8 часов
+      if (Date.now() - verifiedTime < 8 * 60 * 60 * 1000) {
+        setPasswordVerified(true);
+      } else {
+        // Истекла - удалить
+        sessionStorage.removeItem('admin_verified');
+        sessionStorage.removeItem('admin_verified_at');
+        setPasswordVerified(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -62,6 +82,11 @@ const Admin = () => {
   // Redirect if not logged in or not admin
   if (!user || isAdmin === false) {
     return <Navigate to="/" replace />;
+  }
+
+  // Redirect to account if password not verified
+  if (!passwordVerified) {
+    return <Navigate to="/account" replace />;
   }
 
   return (
