@@ -32,7 +32,7 @@ export const ChatWindow = ({ chatId, onBack }: ChatWindowProps) => {
     });
   }, [messages, user, markAsRead]);
 
-  const handleScroll = (e: any) => {
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (e.target.scrollTop === 0 && hasMore && !loading) {
       loadMore();
     }
@@ -100,7 +100,7 @@ export const ChatWindow = ({ chatId, onBack }: ChatWindowProps) => {
         </div>
       </ScrollArea>
 
-      <MessageComposer onSend={sendMessage} />
+      <MessageComposer chatId={chatId} onSend={sendMessage} />
     </div>
   );
 };

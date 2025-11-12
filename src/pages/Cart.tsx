@@ -60,7 +60,11 @@ const Cart = () => {
                   <img 
                     src={item.product?.image || '/placeholder.svg'} 
                     alt={item.product?.name}
+                    loading="lazy"
                     className="w-24 h-24 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200';
+                    }}
                   />
                   
                   <div className="flex-1">

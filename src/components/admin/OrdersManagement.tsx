@@ -20,18 +20,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import type { Order as OrderType, Profile } from "@/types/database";
 
-interface Order {
-  id: string;
-  created_at: string;
-  total: number;
-  status: string;
-  payment_status: string;
-  user_id: string;
-  profiles?: {
-    first_name: string;
-    last_name: string;
-  };
+interface Order extends OrderType {
+  profiles?: Partial<Profile>;
 }
 
 const OrdersManagement = () => {
@@ -65,7 +57,7 @@ const OrdersManagement = () => {
           profiles: profilesData?.find(p => p.id === order.user_id)
         }));
 
-        setOrders(ordersWithProfiles as any);
+        setOrders(ordersWithProfiles);
       }
     } catch (error) {
       console.error('Error loading orders:', error);

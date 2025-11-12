@@ -47,7 +47,7 @@ export const NewChatDialog = ({ open, onClose, onChatCreated }: NewChatDialogPro
 
       if (error) throw error;
       setUsers(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error searching users:', error);
       toast.error('Ошибка поиска пользователей');
     } finally {
@@ -65,7 +65,7 @@ export const NewChatDialog = ({ open, onClose, onChatCreated }: NewChatDialogPro
       onChatCreated(data);
       onClose();
       toast.success('Чат создан');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating chat:', error);
       toast.error('Ошибка создания чата');
     }
@@ -107,7 +107,7 @@ export const NewChatDialog = ({ open, onClose, onChatCreated }: NewChatDialogPro
       toast.success('Группа создана');
       setGroupName('');
       setSelectedUsers([]);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating group:', error);
       toast.error('Ошибка создания группы');
     }

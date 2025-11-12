@@ -9,6 +9,7 @@ import { Chat } from '@/hooks/useChat';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
+import type { ChatMember } from '@/types/database';
 
 interface ChatListProps {
   chats: Chat[];
@@ -19,14 +20,14 @@ interface ChatListProps {
 
 export const ChatList = ({ chats, selectedChatId, onSelectChat, onNewChat }: ChatListProps) => {
   const [search, setSearch] = useState('');
-  const [chatMembers, setChatMembers] = useState<Record<string, any[]>>({});
+  const [chatMembers, setChatMembers] = useState<Record<string, ChatMember[]>>({});
 
   useEffect(() => {
     loadChatMembers();
   }, [chats]);
 
   const loadChatMembers = async () => {
-    const members: Record<string, any[]> = {};
+    const members: Record<string, ChatMember[]> = {};
     
     for (const chat of chats) {
       if (chat.type === 'direct') {
@@ -59,7 +60,7 @@ export const ChatList = ({ chats, selectedChatId, onSelectChat, onNewChat }: Cha
     
     // For direct chats, show the other user's name
     const members = chatMembers[chat.id] || [];
-    const otherMember = members.find((m: any) => m.user_id !== supabase.auth.getUser());
+    const otherMember = members.find((m) => m.user_id !== supabase.auth.getUser());
     if (otherMember && otherMember.profiles) {
       const profile = Array.isArray(otherMember.profiles) ? otherMember.profiles[0] : otherMember.profiles;
       if (profile.nickname) return `@${profile.nickname}`;

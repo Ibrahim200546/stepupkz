@@ -89,7 +89,7 @@ const Checkout = () => {
       await clearCart();
       toast.success('Заказ успешно оформлен!');
       navigate('/account');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating order:', error);
       toast.error('Ошибка оформления заказа');
     } finally {

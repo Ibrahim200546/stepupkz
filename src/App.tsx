@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { CartProvider } from "./hooks/useCart";
+import { usePresence } from "./hooks/usePresence";
 import SEOHead from "./components/SEOHead";
 import "./i18n";
 import Index from "./pages/Index";
@@ -28,6 +29,34 @@ import VendorProducts from "./pages/VendorProducts";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  // Track online presence
+  usePresence();
+
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/catalog" element={<Catalog />} />
+      <Route path="/product/:id" element={<Product />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/account" element={<Account />} />
+      <Route path="/admin/*" element={<Admin />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/delivery" element={<Delivery />} />
+      <Route path="/returns" element={<Returns />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/chat" element={<Chat />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/vendor/register" element={<VendorRegister />} />
+      <Route path="/vendor/products" element={<VendorProducts />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -37,27 +66,7 @@ const App = () => (
         <SEOHead />
         <AuthProvider>
           <CartProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/catalog" element={<Catalog />} />
-              <Route path="/product/:id" element={<Product />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/admin/*" element={<Admin />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/delivery" element={<Delivery />} />
-              <Route path="/returns" element={<Returns />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/vendor/register" element={<VendorRegister />} />
-              <Route path="/vendor/products" element={<VendorProducts />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppContent />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>

@@ -51,7 +51,8 @@ const HeroSection = () => {
           <div className="relative">
             <img 
               src={heroImage} 
-              alt="Новая коллекция обуви" 
+              alt="Новая коллекция обуви"
+              loading="eager"
               className="w-full h-auto rounded-2xl shadow-2xl"
             />
           </div>

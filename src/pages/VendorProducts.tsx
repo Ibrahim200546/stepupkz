@@ -83,7 +83,7 @@ const VendorProducts = () => {
 
       if (error) throw error;
       setProducts(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading products:', error);
       toast.error('Ошибка загрузки товаров');
     } finally {
@@ -137,9 +137,9 @@ const VendorProducts = () => {
       setEditingProduct(null);
       setDialogOpen(false);
       loadProducts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving product:', error);
-      toast.error(error.message || 'Ошибка сохранения товара');
+      toast.error(error instanceof Error ? error.message : 'Ошибка сохранения товара');
     } finally {
       setLoading(false);
     }
@@ -169,7 +169,7 @@ const VendorProducts = () => {
       if (error) throw error;
       toast.success('Товар удалён');
       loadProducts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting product:', error);
       toast.error('Ошибка удаления товара');
     }

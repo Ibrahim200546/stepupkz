@@ -1,73 +1,402 @@
-# Welcome to your Lovable project
+# 👟 StepUp Shoes - Интернет-магазин обуви в Казахстане
 
-## Project info
+**Проект:** Современный e-commerce магазин обуви с чатом, системой продавцов и административной панелью  
+**Технологии:** React + TypeScript + Vite + Supabase + shadcn/ui + Tailwind CSS
 
-**URL**: https://lovable.dev/projects/99ff7b2d-0ce5-47e0-8650-bb676cdd8702
+---
 
-## How can I edit this code?
+## 🚀 Быстрый старт
 
-There are several ways of editing your application.
+### Предварительные требования
 
-**Use Lovable**
+- [Node.js](https://nodejs.org/) версии 18.0 или выше
+- [npm](https://www.npmjs.com/) или [yarn](https://yarnpkg.com/)
+- Аккаунт в [Supabase](https://supabase.com)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/99ff7b2d-0ce5-47e0-8650-bb676cdd8702) and start prompting.
+### Установка
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Клонировать репозиторий:**
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
 git clone <YOUR_GIT_URL>
+cd stepupkz
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. **Установить зависимости:**
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+npm install
+# или
+npm ci  # для чистой установки
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. **Настроить переменные окружения:**
+
+```bash
+# Скопировать пример
+cp .env.example .env
+
+# Отредактировать .env и вставить свои ключи Supabase
+```
+
+**Файл `.env` должен содержать:**
+
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# OpenAI Configuration (optional for chatbot)
+VITE_OPENAI_API_KEY=
+
+# Environment
+NODE_ENV=development
+```
+
+**Где взять ключи Supabase:**
+1. Откройте [Supabase Dashboard](https://supabase.com/dashboard)
+2. Выберите свой проект
+3. Settings → API
+4. Скопируйте `Project URL` и `anon public` key
+
+4. **Применить миграции БД:**
+
+См. подробную инструкцию в `SUPABASE_SETUP_GUIDE.md`
+
+Или быстрый способ:
+- Откройте Supabase Dashboard → SQL Editor
+- Скопируйте содержимое `FIXED_MIGRATIONS_ORDER.sql`
+- Выполните (RUN)
+
+5. **Создать Storage bucket:**
+
+- Supabase Dashboard → Storage → New bucket
+- Name: `chat-attachments`
+- Public: ✅ Yes
+
+6. **Запустить dev сервер:**
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Откройте [http://localhost:8080](http://localhost:8080) в браузере.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📁 Структура проекта
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+stepupkz/
+├── public/              # Статические файлы
+├── src/
+│   ├── components/      # React компоненты
+│   │   ├── admin/      # Админ панель
+│   │   ├── chat/       # Чат система
+│   │   ├── layout/     # Layout (Header, Footer)
+│   │   ├── products/   # Компоненты товаров
+│   │   └── ui/         # shadcn/ui компоненты
+│   ├── hooks/          # Custom React hooks
+│   ├── integrations/   # Внешние интеграции
+│   │   └── supabase/   # Supabase client и типы
+│   ├── lib/            # Утилиты и helpers
+│   ├── pages/          # Страницы приложения
+│   ├── types/          # TypeScript типы
+│   ├── i18n/           # Интернационализация (ru/en/kk)
+│   ├── App.tsx         # Главный компонент
+│   └── main.tsx        # Точка входа
+├── supabase/
+│   └── migrations/     # SQL миграции
+├── .env                # Переменные окружения (не в git!)
+├── .env.example        # Пример env переменных
+├── package.json        # Зависимости проекта
+├── vite.config.ts      # Конфигурация Vite
+└── tailwind.config.ts  # Конфигурация Tailwind
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🛠️ Доступные команды
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+# Development
+npm run dev          # Запустить dev сервер (http://localhost:8080)
 
-## How can I deploy this project?
+# Build
+npm run build        # Production сборка
+npm run build:dev    # Development сборка
 
-Simply open [Lovable](https://lovable.dev/projects/99ff7b2d-0ce5-47e0-8650-bb676cdd8702) and click on Share -> Publish.
+# Quality checks
+npm run lint         # Проверить код (ESLint)
 
-## Can I connect a custom domain to my Lovable project?
+# Preview
+npm run preview      # Просмотреть production сборку локально
+```
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🌟 Основные функции
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### ✅ E-commerce
+- 🛍️ Каталог товаров с фильтрацией и сортировкой
+- 🔍 Поиск товаров
+- 🛒 Корзина с сохранением в БД
+- 💳 Оформление заказов
+- 📦 Отслеживание заказов в личном кабинете
+- ⭐ Система отзывов (опционально)
+
+### 💬 Чат система
+- 💌 Приватные диалоги (1:1)
+- 👥 Групповые чаты
+- 📎 Отправка изображений и файлов
+- ✅ Read receipts (отметки о прочтении)
+- 🟢 Онлайн статус пользователей
+- 🔍 Поиск пользователей по @nickname, email, phone
+- ⚡ Realtime обновления через Supabase
+
+### 🏪 Marketplace для продавцов
+- 📝 Регистрация магазина
+- ➕ Добавление товаров
+- 📊 Статистика продаж
+- ✅ Верификация продавцов админом
+
+### 👨‍💼 Админ панель
+- 👤 Управление пользователями
+- 📦 Управление заказами
+- 🏷️ Управление товарами
+- 💬 Модерация чатов
+- 📊 Статистика и аналитика
+
+### 🌐 Мультиязычность
+- 🇷🇺 Русский
+- 🇬🇧 English
+- 🇰🇿 Қазақша (Казахский)
+
+### 🎨 UI/UX
+- 🌓 Темная и светлая темы
+- 📱 Адаптивный дизайн (mobile-first)
+- ♿ Accessibility (ARIA атрибуты)
+- ⚡ Быстрая загрузка (lazy loading)
+- 🎭 Smooth анимации
+
+---
+
+## 🔐 Безопасность
+
+### Row Level Security (RLS)
+Все таблицы защищены RLS политиками Supabase:
+- Пользователи видят только свои данные
+- Админы имеют полный доступ
+- Продавцы управляют только своими товарами
+
+### Environment Variables
+❌ **НИКОГДА не коммитьте `.env` файл в git!**
+
+`.env` уже добавлен в `.gitignore`
+
+### API Keys
+- Публичный `ANON_KEY` безопасен для клиента
+- Секретные ключи храните на сервере
+- OpenAI ключ (если используется) должен быть на backend
+
+---
+
+## 📚 Документация
+
+### Основные гайды (в репозитории):
+
+- **`SUPABASE_SETUP_GUIDE.md`** - Пошаговая настройка Supabase с нуля
+- **`CHAT_TESTING_GUIDE.md`** - Тестирование чат системы
+- **`RLS_FIX_INSTRUCTIONS.md`** - Исправление RLS рекурсии
+- **`WHITE_SCREEN_FIX.md`** - Решение проблемы белого экрана
+- **`ANALYSIS_REPORT.md`** - Полный отчет по проекту
+- **`FIXED_MIGRATIONS_ORDER.sql`** - Все миграции БД в одном файле
+
+### Назначение администратора
+
+После регистрации первого пользователя:
+
+```sql
+-- Откройте Supabase Dashboard → SQL Editor
+
+-- Узнать свой ID
+SELECT id, email FROM auth.users;
+
+-- Назначить роль admin
+INSERT INTO user_roles (user_id, role)
+VALUES ('ваш-user-id-здесь', 'admin')
+ON CONFLICT (user_id, role) DO NOTHING;
+```
+
+Затем откройте `/admin` для доступа к админ панели.
+
+---
+
+## 🧪 Тестирование
+
+### Ручное тестирование
+
+См. подробные сценарии в `CHAT_TESTING_GUIDE.md`
+
+**Базовый сценарий:**
+1. Зарегистрировать 2 пользователей (разные браузеры/инкогнито)
+2. Открыть `/chat`
+3. Создать чат между пользователями
+4. Отправить текстовые сообщения
+5. Отправить изображения
+6. Проверить realtime доставку
+
+### Проверка сборки
+
+```bash
+npm run build
+```
+
+Должна пройти без ошибок.
+
+---
+
+## 🐛 Частые проблемы
+
+### Белый экран
+**Причина:** Неправильные env переменные
+
+**Решение:**
+1. Проверить `.env` файл существует
+2. Проверить правильность `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY`
+3. Перезапустить dev сервер (`npm run dev`)
+4. См. `WHITE_SCREEN_FIX.md`
+
+### Ошибка "Invalid API key"
+**Причина:** Старый/неправильный ANON_KEY
+
+**Решение:**
+1. Скопировать fresh ключ из Supabase Dashboard → Settings → API
+2. Обновить `.env`
+3. Перезапустить сервер
+
+### Ошибка "relation does not exist"
+**Причина:** Миграции БД не применены
+
+**Решение:**
+1. Применить `FIXED_MIGRATIONS_ORDER.sql` через SQL Editor
+2. См. `SUPABASE_SETUP_GUIDE.md`
+
+### Ошибка "infinite recursion in policy"
+**Причина:** Циклические RLS политики
+
+**Решение:**
+1. Применить миграцию `20251111130000_fix_chat_rls_recursion.sql`
+2. См. `RLS_FIX_INSTRUCTIONS.md`
+
+### Изображения не загружаются в чат
+**Причина:** Storage bucket не создан
+
+**Решение:**
+1. Supabase Dashboard → Storage → New bucket
+2. Name: `chat-attachments`, Public: Yes
+
+---
+
+## 📦 Деплой
+
+### Vercel / Netlify
+
+1. **Подключить репозиторий**
+2. **Настроить env переменные** в UI панели
+3. **Build command:** `npm run build`
+4. **Output directory:** `dist`
+
+### Своя инфраструктура
+
+```bash
+# 1. Собрать production bundle
+npm run build
+
+# 2. Деплой папки dist на сервер
+# Можно использовать nginx, Apache, или CDN
+```
+
+**Пример nginx конфигурации:**
+
+```nginx
+server {
+  listen 80;
+  server_name stepup.kz;
+  root /var/www/stepupkz/dist;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
+```
+
+---
+
+## 🤝 Вклад в проект
+
+1. Fork репозитория
+2. Создать feature ветку (`git checkout -b feature/AmazingFeature`)
+3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
+4. Push в ветку (`git push origin feature/AmazingFeature`)
+5. Открыть Pull Request
+
+### Git Guidelines
+- Используйте понятные commit сообщения
+- Следуйте существующему code style
+- Добавляйте тесты для новых функций
+- Обновляйте документацию
+
+---
+
+## 📄 Лицензия
+
+Этот проект создан для коммерческого использования. Все права защищены.
+
+---
+
+## 📞 Контакты
+
+**Email:** tanirbergenibrahim44@gmail.com  
+**Project:** StepUp Shoes Kazakhstan
+
+---
+
+## 🙏 Благодарности
+
+- [Supabase](https://supabase.com) - Backend as a Service
+- [shadcn/ui](https://ui.shadcn.com/) - UI компоненты
+- [Vite](https://vitejs.dev/) - Build tool
+- [React](https://react.dev/) - UI библиотека
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+
+---
+
+## 📊 Статус проекта
+
+✅ **Ready for production**
+
+**Версия:** 1.0.0  
+**Последнее обновление:** 11 ноября 2025
+
+### Что работает:
+- ✅ Регистрация и авторизация
+- ✅ Каталог товаров
+- ✅ Корзина и заказы
+- ✅ Чат система (1:1 и группы)
+- ✅ Админ панель
+- ✅ Vendor marketplace
+- ✅ Мультиязычность
+- ✅ Темная/светлая темы
+- ✅ Мобильная версия
+
+### В разработке:
+- 🔄 Push уведомления
+- 🔄 AI chatbot widget
+- 🔄 Система рекомендаций
+- 🔄 Интеграция с Kaspi.kz
+
+---
+
+Made with ❤️ in Kazakhstan

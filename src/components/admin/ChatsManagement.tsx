@@ -9,26 +9,10 @@ import { toast } from 'sonner';
 import { Trash2, Eye, Search } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
-
-interface Report {
-  id: string;
-  message_id: string;
-  reported_by: string;
-  reason: string;
-  status: 'open' | 'reviewed' | 'resolved';
-  created_at: string;
-  message?: {
-    content: string;
-    sender_id: string;
-  };
-  reporter?: {
-    first_name?: string;
-    last_name?: string;
-  };
-}
+import type { MessageReport } from '@/types/database';
 
 const ChatsManagement = () => {
-  const [reports, setReports] = useState<Report[]>([]);
+  const [reports, setReports] = useState<MessageReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -49,14 +33,14 @@ const ChatsManagement = () => {
 
       if (error) throw error;
       
-      const typedReports = (data || []).map((report: any) => ({
+      const typedReports = (data || []).map((report: MessageReport) => ({
         ...report,
         status: report.status as 'open' | 'reviewed' | 'resolved',
         reporter: report.reporter as { first_name?: string; last_name?: string } | undefined
       }));
       
       setReports(typedReports);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading reports:', error);
       toast.error('Ошибка загрузки жалоб');
     } finally {
@@ -76,7 +60,7 @@ const ChatsManagement = () => {
       if (error) throw error;
       toast.success('Сообщение удалено');
       loadReports();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting message:', error);
       toast.error('Ошибка удаления сообщения');
     }
@@ -95,7 +79,7 @@ const ChatsManagement = () => {
       if (error) throw error;
       toast.success('Статус обновлен');
       loadReports();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating report:', error);
       toast.error('Ошибка обновления статуса');
     }

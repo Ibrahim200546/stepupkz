@@ -8,11 +8,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingCart, Heart, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
+import type { Product as ProductType } from "@/types/database";
+
+interface ProductWithDetails extends ProductType {
+  brand?: { name: string };
+  product_images: Array<{ url: string; alt?: string }>;
+  product_variants: Array<{ id: string; size?: string; color?: string; stock?: number }>;
+}
 
 const Product = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<ProductWithDetails | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -100,14 +107,26 @@ const Product = () => {
               <img 
                 src={product.product_images[0]?.url || '/placeholder.svg'} 
                 alt={product.name}
+                loading="lazy"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800';
+                }}
               />
             </div>
             {product.product_images.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
-                {product.product_images.slice(1, 5).map((img: any, idx: number) => (
+                {product.product_images.slice(1, 5).map((img, idx) => (
                   <div key={idx} className="aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition">
-                    <img src={img.url} alt={img.alt || product.name} className="w-full h-full object-cover" />
+                    <img 
+                      src={img.url} 
+                      alt={img.alt || product.name} 
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400';
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -147,7 +166,7 @@ const Product = () => {
             <div>
               <h3 className="font-semibold mb-3">Выберите размер:</h3>
               <div className="grid grid-cols-4 gap-2">
-                {product.product_variants?.map((variant: any) => (
+                {product.product_variants?.map((variant) => (
                   <Button
                     key={variant.id}
                     variant={selectedVariant === variant.id ? "default" : "outline"}

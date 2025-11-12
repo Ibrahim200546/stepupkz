@@ -63,8 +63,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast.success('Регистрация успешна! Войдите в систему.');
       navigate('/auth');
-    } catch (error: any) {
-      toast.error(error.message || 'Ошибка регистрации');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка регистрации');
       throw error;
     }
   };
@@ -80,8 +80,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast.success('Вход выполнен успешно!');
       navigate('/');
-    } catch (error: any) {
-      toast.error(error.message || 'Ошибка входа');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка входа');
       throw error;
     }
   };
@@ -93,8 +93,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast.success('Вы вышли из системы');
       navigate('/');
-    } catch (error: any) {
-      toast.error(error.message || 'Ошибка выхода');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка выхода');
       throw error;
     }
   };

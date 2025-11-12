@@ -2,6 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useCart } from "@/hooks/useCart";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface ProductCardProps {
   id: number;
@@ -15,6 +19,8 @@ interface ProductCardProps {
 
 const ProductCard = ({ id, name, brand, price, oldPrice, image, inStock }: ProductCardProps) => {
   const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+  const { addToCart } = useCart();
+  const [adding, setAdding] = useState(false);
 
   return (
     <Card className="group relative overflow-hidden border bg-card hover:shadow-card-hover transition-smooth">
@@ -24,7 +30,11 @@ const ProductCard = ({ id, name, brand, price, oldPrice, image, inStock }: Produ
           <img 
             src={image} 
             alt={name}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400';
+            }}
           />
           
           {/* Discount Badge */}
@@ -80,13 +90,39 @@ const ProductCard = ({ id, name, brand, price, oldPrice, image, inStock }: Produ
           <Button 
             className="w-full" 
             variant="outline"
-            onClick={(e) => {
+            disabled={adding}
+            onClick={async (e) => {
               e.preventDefault();
-              // TODO: Add to cart
+              e.stopPropagation();
+              
+              setAdding(true);
+              try {
+                // Get first available variant for this product
+                const { data: variants, error } = await supabase
+                  .from('product_variants')
+                  .select('id')
+                  .eq('product_id', id)
+                  .gt('stock', 0) // Get variants with stock > 0
+                  .limit(1);
+
+                if (error) throw error;
+
+                if (variants && variants.length > 0) {
+                  await addToCart(variants[0].id);
+                  toast.success('Товар добавлен в корзину');
+                } else {
+                  toast.error('Товар временно недоступен');
+                }
+              } catch (error) {
+                console.error('Error adding to cart:', error);
+                toast.error('Не удалось добавить в корзину');
+              } finally {
+                setAdding(false);
+              }
             }}
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
-            В корзину
+            {adding ? 'Добавление...' : 'В корзину'}
           </Button>
         </div>
       )}

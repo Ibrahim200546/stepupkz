@@ -2,6 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { PostgrestError } from '@supabase/supabase-js';
+
+export interface MessageAttachment {
+  url: string;
+  type: 'image' | 'video' | 'file';
+  name?: string;
+  size?: number;
+}
 
 export interface Chat {
   id: string;
@@ -35,7 +43,7 @@ export interface Message {
   sender_id?: string;
   content?: string;
   content_format: 'plain' | 'markdown';
-  attachments: any[];
+  attachments: MessageAttachment[];
   created_at: string;
   edited_at?: string;
   deleted: boolean;
@@ -127,7 +135,7 @@ export const useChat = () => {
           const typedLastMessage = lastMsg ? {
             ...lastMsg,
             content_format: lastMsg.content_format as 'plain' | 'markdown',
-            attachments: (lastMsg.attachments || []) as any[]
+            attachments: (lastMsg.attachments || []) as MessageAttachment[]
           } : undefined;
 
           return {
@@ -139,8 +147,9 @@ export const useChat = () => {
       );
 
       setChats(chatsWithMessages);
-    } catch (error: any) {
-      console.error('Error loading chats:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error loading chats:', err);
       toast.error('Ошибка загрузки чатов');
     } finally {
       setLoading(false);
@@ -187,8 +196,9 @@ export const useChat = () => {
       if (error) throw error;
       await loadChats();
       return data;
-    } catch (error: any) {
-      console.error('Error creating chat:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error creating chat:', err);
       toast.error('Ошибка создания чата');
       throw error;
     }
@@ -222,8 +232,9 @@ export const useChat = () => {
 
       await loadChats();
       return chat.id;
-    } catch (error: any) {
-      console.error('Error creating group chat:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error creating group chat:', err);
       toast.error('Ошибка создания группового чата');
       throw error;
     }
@@ -251,7 +262,7 @@ export const useChatMessages = (chatId: string | null) => {
     try {
       let query = supabase
         .from('messages')
-        .select('*, reads:message_reads(*)')
+        .select('*, sender:profiles(first_name, last_name, avatar_url, nickname), reads:message_reads(*)')
         .eq('chat_id', chatId)
         .eq('deleted', false)
         .order('created_at', { ascending: false })
@@ -267,15 +278,16 @@ export const useChatMessages = (chatId: string | null) => {
 
       if (data.length < 50) setHasMore(false);
 
-      const typedMessages = (data || []).map((msg: any) => ({
+      const typedMessages = (data || []).map((msg) => ({
         ...msg,
         content_format: msg.content_format as 'plain' | 'markdown',
-        attachments: (msg.attachments || []) as any[]
+        attachments: (msg.attachments || []) as MessageAttachment[]
       }));
 
       setMessages(prev => before ? [...prev, ...typedMessages.reverse()] : typedMessages.reverse());
-    } catch (error: any) {
-      console.error('Error loading messages:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error loading messages:', err);
       toast.error('Ошибка загрузки сообщений');
     } finally {
       setLoading(false);
@@ -302,9 +314,16 @@ export const useChatMessages = (chatId: string | null) => {
         table: 'messages',
         filter: `chat_id=eq.${chatId}`
       }, async (payload) => {
+        // Skip if message already exists (from optimistic UI)
+        if (payload.new.sender_id === user?.id) {
+          // Check if we already have this message
+          const exists = messages.find(m => m.id === payload.new.id);
+          if (exists) return;
+        }
+
         const { data: newMsg } = await supabase
           .from('messages')
-          .select('*, reads:message_reads(*)')
+          .select('*, sender:profiles(first_name, last_name, avatar_url), reads:message_reads(*)')
           .eq('id', payload.new.id)
           .single();
 
@@ -312,35 +331,80 @@ export const useChatMessages = (chatId: string | null) => {
           const typedMsg: Message = {
             ...newMsg,
             content_format: newMsg.content_format as 'plain' | 'markdown',
-            attachments: (newMsg.attachments || []) as any[]
+            attachments: (newMsg.attachments || []) as MessageAttachment[]
           };
-          setMessages(prev => [...prev, typedMsg]);
+          
+          setMessages(prev => {
+            // Avoid duplicates
+            if (prev.find(m => m.id === typedMsg.id)) return prev;
+            return [...prev, typedMsg];
+          });
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Subscribed to chat:', chatId);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [chatId]);
+  }, [chatId, user, messages]);
 
-  const sendMessage = async (content: string, attachments: any[] = []) => {
-    if (!chatId || !user || !content.trim()) return;
+  const sendMessage = async (content: string, attachments: MessageAttachment[] = []) => {
+    if (!chatId || !user) return;
+    if (!content.trim() && attachments.length === 0) return;
+
+    // Optimistic UI: add temporary message
+    const tempId = `temp-${Date.now()}`;
+    const tempMessage: Message = {
+      id: tempId,
+      chat_id: chatId,
+      sender_id: user.id,
+      content: content.trim() || undefined,
+      content_format: 'plain',
+      attachments,
+      created_at: new Date().toISOString(),
+      deleted: false,
+      reads: []
+    };
+
+    // Add immediately to UI
+    setMessages(prev => [...prev, tempMessage]);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('messages')
         .insert({
           chat_id: chatId,
           sender_id: user.id,
-          content: content.trim(),
-          attachments
-        });
+          content: content.trim() || null,
+          content_format: 'plain',
+          attachments: attachments.length > 0 ? attachments : []
+        })
+        .select('*, reads:message_reads(*)')
+        .single();
 
       if (error) throw error;
-    } catch (error: any) {
-      console.error('Error sending message:', error);
-      toast.error('Ошибка отправки сообщения');
+
+      // Replace temp message with real one
+      if (data) {
+        setMessages(prev => 
+          prev.map(msg => msg.id === tempId ? {
+            ...data,
+            content_format: data.content_format as 'plain' | 'markdown',
+            attachments: (data.attachments || []) as MessageAttachment[]
+          } : msg)
+        );
+      }
+    } catch (error) {
+      // Remove temp message on error
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      
+      const err = error as PostgrestError;
+      console.error('Error sending message:', err);
+      toast.error(`Ошибка отправки: ${err.message || 'Неизвестная ошибка'}`);
     }
   };
 
@@ -356,8 +420,9 @@ export const useChatMessages = (chatId: string | null) => {
         }, {
           onConflict: 'message_id,user_id'
         });
-    } catch (error: any) {
-      console.error('Error marking message as read:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error marking message as read:', err);
     }
   };
 

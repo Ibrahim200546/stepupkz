@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Search } from 'lucide-react';
+import type { Profile } from '@/types/database';
 
 interface UserSearchProps {
   onSelectUser: (userId: string) => void;
@@ -12,7 +13,7 @@ interface UserSearchProps {
 
 export const UserSearch = ({ onSelectUser, placeholder }: UserSearchProps) => {
   const [search, setSearch] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const UserSearch = ({ onSelectUser, placeholder }: UserSearchProps) => {
     }
   };
 
-  const getDisplayName = (user: any) => {
+  const getDisplayName = (user: Profile) => {
     if (user.first_name && user.last_name) {
       return `${user.first_name} ${user.last_name}`;
     }

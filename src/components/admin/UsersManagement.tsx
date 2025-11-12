@@ -53,7 +53,7 @@ const UsersManagement = () => {
           user_roles: rolesData?.filter(r => r.user_id === profile.id) || []
         }));
 
-        setUsers(usersWithRoles as any);
+        setUsers(usersWithRoles);
       }
     } catch (error) {
       console.error('Error loading users:', error);

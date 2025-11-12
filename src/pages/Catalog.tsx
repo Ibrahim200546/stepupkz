@@ -9,9 +9,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import type { Product } from "@/types/database";
+
+interface CatalogProduct {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  oldPrice?: number;
+  image: string;
+  inStock: boolean;
+}
 
 const Catalog = () => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [priceRange, setPriceRange] = useState([0, 100000]);
 
@@ -33,7 +44,7 @@ const Catalog = () => {
 
       if (error) throw error;
 
-      const formattedProducts = data?.map((product: any) => ({
+      const formattedProducts = data?.map((product) => ({
         id: product.id,
         name: product.name,
         brand: product.brand?.name || '',

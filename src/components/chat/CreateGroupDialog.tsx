@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Profile } from '@/types/database';
 
 interface CreateGroupDialogProps {
   open: boolean;
@@ -17,7 +18,7 @@ interface CreateGroupDialogProps {
 
 export const CreateGroupDialog = ({ open, onClose, onGroupCreated }: CreateGroupDialogProps) => {
   const [title, setTitle] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleSelectUser = async (userId: string) => {
@@ -91,7 +92,7 @@ export const CreateGroupDialog = ({ open, onClose, onGroupCreated }: CreateGroup
       // Reset form
       setTitle('');
       setSelectedUsers([]);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating group:', error);
       toast.error(error.message || 'Ошибка создания группы');
     } finally {
@@ -99,7 +100,7 @@ export const CreateGroupDialog = ({ open, onClose, onGroupCreated }: CreateGroup
     }
   };
 
-  const getDisplayName = (user: any) => {
+  const getDisplayName = (user: Profile) => {
     if (user.nickname) return `@${user.nickname}`;
     if (user.first_name) return `${user.first_name} ${user.last_name || ''}`.trim();
     return 'Пользователь';

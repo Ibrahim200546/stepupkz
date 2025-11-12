@@ -12,11 +12,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, User, Heart, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import type { Order, Profile } from "@/types/database";
 
 const Account = () => {
   const { user, loading: authLoading } = useAuth();
-  const [orders, setOrders] = useState<any[]>([]);
-  const [profile, setProfile] = useState<any>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [copied, setCopied] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -100,8 +101,8 @@ const Account = () => {
       toast.success('Профиль обновлён');
       setEditMode(false);
       loadProfile();
-    } catch (error: any) {
-      toast.error(error.message || 'Ошибка сохранения');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка сохранения');
     }
   };
 
@@ -121,7 +122,7 @@ const Account = () => {
   }
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, any> = {
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
       pending: 'secondary',
       processing: 'default',
       shipped: 'default',
@@ -201,12 +202,16 @@ const Account = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {order.order_items.map((item: any) => (
+                    {order.order_items?.map((item) => (
                       <div key={item.id} className="flex gap-4 p-3 bg-muted/30 rounded-lg">
                         <img 
                           src={item.product_variants.products.product_images[0]?.url || '/placeholder.svg'}
                           alt={item.product_variants.products.name}
+                          loading="lazy"
                           className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200';
+                          }}
                         />
                         <div className="flex-1">
                           <h4 className="font-medium">{item.product_variants.products.name}</h4>

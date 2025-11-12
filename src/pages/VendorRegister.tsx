@@ -50,9 +50,9 @@ const VendorRegister = () => {
 
       toast.success('Заявка на регистрацию магазина отправлена! Ожидайте подтверждения.');
       navigate('/account');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error registering vendor:', error);
-      toast.error(error.message || 'Ошибка регистрации магазина');
+      toast.error(error instanceof Error ? error.message : 'Ошибка регистрации магазина');
     } finally {
       setLoading(false);
     }

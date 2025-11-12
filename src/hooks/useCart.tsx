@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { PostgrestError } from '@supabase/supabase-js';
 
 interface CartItem {
   id: string;
@@ -60,7 +61,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(true);
       
       // Try to get existing cart
-      let { data: cart, error } = await supabase
+      const { data: cart, error } = await supabase
         .from('carts')
         .select('id')
         .eq('user_id', user.id)
@@ -70,8 +71,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
 
+      let finalCart = cart;
+
       // Create cart if it doesn't exist
-      if (!cart) {
+      if (!finalCart) {
         const { data: newCart, error: createError } = await supabase
           .from('carts')
           .insert({ user_id: user.id })
@@ -79,13 +82,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           .single();
 
         if (createError) throw createError;
-        cart = newCart;
+        finalCart = newCart;
       }
 
-      setCartId(cart.id);
-      await loadCartItems(cart.id);
-    } catch (error: any) {
-      console.error('Error getting cart:', error);
+      if (finalCart) {
+        setCartId(finalCart.id);
+        await loadCartItems(finalCart.id);
+      }
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error getting cart:', err);
       toast.error('Ошибка загрузки корзины');
     } finally {
       setLoading(false);
@@ -114,7 +120,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      const items = data.map((item: any) => ({
+      const items = (data || []).map((item) => ({
         id: item.id,
         product_variant_id: item.product_variant_id,
         quantity: item.quantity,
@@ -130,8 +136,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }));
 
       setCartItems(items);
-    } catch (error: any) {
-      console.error('Error loading cart items:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error loading cart items:', err);
     }
   };
 
@@ -161,8 +168,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         await loadCartItems(cartId);
         toast.success('Товар добавлен в корзину');
       }
-    } catch (error: any) {
-      console.error('Error adding to cart:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error adding to cart:', err);
       toast.error('Ошибка добавления в корзину');
     }
   };
@@ -184,8 +192,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setCartItems(prev => 
         prev.map(item => item.id === itemId ? { ...item, quantity } : item)
       );
-    } catch (error: any) {
-      console.error('Error updating quantity:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error updating quantity:', err);
       toast.error('Ошибка обновления количества');
     }
   };
@@ -201,8 +210,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       setCartItems(prev => prev.filter(item => item.id !== itemId));
       toast.success('Товар удален из корзины');
-    } catch (error: any) {
-      console.error('Error removing from cart:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error removing from cart:', err);
       toast.error('Ошибка удаления из корзины');
     }
   };
@@ -220,8 +230,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       setCartItems([]);
       toast.success('Корзина очищена');
-    } catch (error: any) {
-      console.error('Error clearing cart:', error);
+    } catch (error) {
+      const err = error as PostgrestError;
+      console.error('Error clearing cart:', err);
       toast.error('Ошибка очистки корзины');
     }
   };

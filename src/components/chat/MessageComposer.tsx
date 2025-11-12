@@ -1,19 +1,111 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Paperclip, Smile } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Send, Paperclip, Smile, X, ImageIcon, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { optimizeImage, isValidImage, formatFileSize } from '@/lib/imageOptimizer';
+import { toast } from 'sonner';
+import type { MessageAttachment } from '@/hooks/useChat';
 
 interface MessageComposerProps {
-  onSend: (content: string, attachments?: any[]) => void;
+  chatId: string;
+  onSend: (content: string, attachments?: MessageAttachment[]) => void;
 }
 
-export const MessageComposer = ({ onSend }: MessageComposerProps) => {
+export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
   const [message, setMessage] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSend = () => {
-    if (message.trim()) {
-      onSend(message);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    const validFiles = files.filter(file => {
+      if (!isValidImage(file)) {
+        toast.error(`${file.name} не является допустимым изображением или слишком большой (макс. 10MB)`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length + attachments.length > 5) {
+      toast.error('Максимум 5 изображений за раз');
+      return;
+    }
+
+    setAttachments(prev => [...prev, ...validFiles]);
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadAttachments = async (): Promise<MessageAttachment[]> => {
+    if (attachments.length === 0) return [];
+
+    const uploadedUrls: MessageAttachment[] = [];
+    
+    for (let i = 0; i < attachments.length; i++) {
+      const file = attachments[i];
+      setUploadProgress(((i + 1) / attachments.length) * 100);
+
+      try {
+        // Optimize image before upload
+        const optimized = await optimizeImage(file, 1920, 1080, 0.85);
+        
+        // Upload to Supabase Storage
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
+        const filePath = `${chatId}/${fileName}`;
+        
+        const { data, error } = await supabase.storage
+          .from('chat-attachments')
+          .upload(filePath, optimized.blob, {
+            contentType: 'image/webp',
+            upsert: false,
+          });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-attachments')
+          .getPublicUrl(data.path);
+
+        uploadedUrls.push({
+          url: publicUrl,
+          type: 'image',
+          name: file.name,
+          size: optimized.optimizedSize,
+        });
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        toast.error(`Ошибка загрузки ${file.name}`);
+      }
+    }
+
+    return uploadedUrls;
+  };
+
+  const handleSend = async () => {
+    if (!message.trim() && attachments.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadedAttachments = await uploadAttachments();
+      onSend(message || 'Изображение', uploadedAttachments);
+      
+      // Clear state
       setMessage('');
+      setAttachments([]);
+      setUploadProgress(0);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Ошибка отправки сообщения');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -25,7 +117,41 @@ export const MessageComposer = ({ onSend }: MessageComposerProps) => {
   };
 
   return (
-    <div className="p-4 border-t">
+    <div className="p-4 border-t space-y-3">
+      {/* Attachment previews */}
+      {attachments.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {attachments.map((file, idx) => (
+            <div key={idx} className="relative flex-shrink-0">
+              <img
+                src={URL.createObjectURL(file)}
+                alt={file.name}
+                className="w-20 h-20 object-cover rounded-lg border"
+              />
+              <Button
+                size="icon"
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                onClick={() => removeAttachment(idx)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-1 rounded-b-lg truncate">
+                {formatFileSize(file.size)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upload progress */}
+      {uploading && (
+        <div className="space-y-1">
+          <Progress value={uploadProgress} className="h-2" />
+          <p className="text-xs text-muted-foreground">Загрузка {Math.round(uploadProgress)}%...</p>
+        </div>
+      )}
+
       <div className="flex gap-2 items-end">
         <div className="flex-1 relative">
           <Textarea
@@ -33,13 +159,34 @@ export const MessageComposer = ({ onSend }: MessageComposerProps) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Введите сообщение..."
+            disabled={uploading}
             className="min-h-[60px] max-h-[200px] resize-none pr-20"
           />
           <div className="absolute right-2 bottom-2 flex gap-1">
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-              <Paperclip className="h-4 w-4" />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleFileSelect}
+              disabled={uploading}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Paperclip className="h-4 w-4" />
+              )}
             </Button>
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+            <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={uploading}>
               <Smile className="h-4 w-4" />
             </Button>
           </div>
@@ -47,16 +194,20 @@ export const MessageComposer = ({ onSend }: MessageComposerProps) => {
         
         <Button 
           onClick={handleSend}
-          disabled={!message.trim()}
+          disabled={(!message.trim() && attachments.length === 0) || uploading}
           size="icon"
           className="h-[60px] w-[60px]"
         >
-          <Send className="h-5 w-5" />
+          {uploading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Send className="h-5 w-5" />
+          )}
         </Button>
       </div>
       
-      <p className="text-xs text-muted-foreground mt-2">
-        Нажмите Enter для отправки, Shift+Enter для новой строки
+      <p className="text-xs text-muted-foreground">
+        Нажмите Enter для отправки, Shift+Enter для новой строки. Макс. 5 изображений (10MB каждое)
       </p>
     </div>
   );
