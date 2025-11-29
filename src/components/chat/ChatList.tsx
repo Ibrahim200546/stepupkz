@@ -107,16 +107,22 @@ export const ChatList = ({ chats, selectedChatId, onSelectChat, onNewChat }: Cha
                 selectedChatId === chat.id ? 'bg-accent' : ''
               }`}
             >
-              <Avatar>
-                <AvatarImage src={getChatAvatar(chat)} />
-                <AvatarFallback>
-                  {chat.type === 'group' ? (
-                    <Users className="h-5 w-5" />
-                  ) : (
-                    getChatTitle(chat)[0]
-                  )}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage src={getChatAvatar(chat)} />
+                  <AvatarFallback>
+                    {chat.type === 'group' ? (
+                      <Users className="h-5 w-5" />
+                    ) : (
+                      getChatTitle(chat)[0]
+                    )}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Online indicator for direct chats */}
+                {chat.type === 'direct' && (
+                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background bg-green-500" />
+                )}
+              </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">

@@ -235,20 +235,6 @@ const Account = () => {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            {/* Debug Info - Remove in production */}
-            {import.meta.env.DEV && (
-              <Card className="p-4 bg-yellow-50 border-yellow-200">
-                <h4 className="font-semibold text-sm mb-2">🐛 Debug Info:</h4>
-                <div className="text-xs space-y-1 font-mono">
-                  <p>hasAdminAccess: {String(hasAdminAccess)}</p>
-                  <p>isAdmin: {String(isAdmin)}</p>
-                  <p>isManager: {String(isManager)}</p>
-                  <p>rolesLoading: {String(rolesLoading)}</p>
-                  <p>User ID: {user?.id}</p>
-                </div>
-              </Card>
-            )}
-
             {/* Admin Access Card */}
             {hasAdminAccess && !rolesLoading && (
               <Card className="p-6 border-primary/50 bg-primary/5">

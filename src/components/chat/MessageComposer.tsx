@@ -2,11 +2,15 @@ import { useState, KeyboardEvent, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Send, Paperclip, Smile, X, ImageIcon, Loader2 } from 'lucide-react';
+import { Send, Paperclip, Smile, X, ImageIcon, Loader2, Sticker } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { optimizeImage, isValidImage, formatFileSize } from '@/lib/imageOptimizer';
 import { toast } from 'sonner';
 import type { MessageAttachment } from '@/hooks/useChat';
+import { VoiceRecorder } from './VoiceRecorder';
+import { CustomEmojiPicker } from './CustomEmojiPicker';
+import { StickerPicker } from './StickerPicker';
+import type { EmojiClickData } from 'emoji-picker-react';
 
 interface MessageComposerProps {
   chatId: string;
@@ -18,6 +22,8 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,6 +122,60 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
     }
   };
 
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setMessage((prev) => prev + emojiData.emoji);
+  };
+
+  const handleStickerClick = async (stickerUrl: string) => {
+    try {
+      const attachment: MessageAttachment = {
+        url: stickerUrl,
+        type: 'sticker',
+        name: 'Sticker',
+        size: 0
+      };
+      onSend('Стикер', [attachment]);
+    } catch (error) {
+      console.error('Error sending sticker:', error);
+      toast.error('Ошибка отправки стикера');
+    }
+  };
+
+  const handleVoiceMessage = async (audioBlob: Blob) => {
+    setUploading(true);
+    try {
+      const fileName = `${Date.now()}-voice.webm`;
+      const filePath = `${chatId}/${fileName}`;
+      
+      const { data, error } = await supabase.storage
+        .from('chat-attachments')
+        .upload(filePath, audioBlob, {
+          contentType: 'audio/webm',
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat-attachments')
+        .getPublicUrl(data.path);
+
+      const attachment: MessageAttachment = {
+        url: publicUrl,
+        type: 'voice',
+        name: 'Голосовое сообщение',
+        size: audioBlob.size
+      };
+
+      onSend('Голосовое сообщение', [attachment]);
+    } catch (error) {
+      console.error('Error uploading voice message:', error);
+      toast.error('Ошибка загрузки голосового сообщения');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="p-4 border-t space-y-3">
       {/* Attachment previews */}
@@ -152,7 +212,40 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
         </div>
       )}
 
+      {/* Emoji Picker */}
+      {showEmojiPicker && (
+        <CustomEmojiPicker
+          onEmojiClick={handleEmojiClick}
+          onClose={() => setShowEmojiPicker(false)}
+        />
+      )}
+
+      {/* Sticker Picker */}
+      {showStickerPicker && (
+        <StickerPicker
+          onStickerClick={handleStickerClick}
+          onClose={() => setShowStickerPicker(false)}
+        />
+      )}
+
       <div className="flex gap-2 items-end">
+        {/* Voice Recorder */}
+        <VoiceRecorder onSend={handleVoiceMessage} />
+
+        {/* Sticker Button */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            setShowStickerPicker(!showStickerPicker);
+            setShowEmojiPicker(false);
+          }}
+          disabled={uploading}
+        >
+          <Sticker className="h-5 w-5" />
+        </Button>
+
         <div className="flex-1 relative">
           <Textarea
             value={message}
@@ -186,7 +279,17 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
                 <Paperclip className="h-4 w-4" />
               )}
             </Button>
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={uploading}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                setShowEmojiPicker(!showEmojiPicker);
+                setShowStickerPicker(false);
+              }}
+              disabled={uploading}
+            >
               <Smile className="h-4 w-4" />
             </Button>
           </div>

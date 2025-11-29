@@ -6,7 +6,7 @@ import { PostgrestError } from '@supabase/supabase-js';
 
 export interface MessageAttachment {
   url: string;
-  type: 'image' | 'video' | 'file';
+  type: 'image' | 'video' | 'file' | 'voice' | 'sticker';
   name?: string;
   size?: number;
 }

@@ -26,6 +26,10 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import VendorRegister from "./pages/VendorRegister";
 import VendorProducts from "./pages/VendorProducts";
+import { AIChatWidget } from "./components/chat/AIChatWidget";
+import FlickChat from "./pages/FlickChat";
+import FlickLogin from "./pages/FlickLogin";
+import FlickRegister from "./pages/FlickRegister";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +38,8 @@ const AppContent = () => {
   usePresence();
 
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/catalog" element={<Catalog />} />
       <Route path="/product/:id" element={<Product />} />
@@ -48,12 +53,19 @@ const AppContent = () => {
       <Route path="/returns" element={<Returns />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/chat" element={<Chat />} />
+      <Route path="/flick-chat" element={<FlickChat />} />
+      <Route path="/flick-login" element={<FlickLogin />} />
+      <Route path="/flick-register" element={<FlickRegister />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/vendor/register" element={<VendorRegister />} />
       <Route path="/vendor/products" element={<VendorProducts />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
+    
+    {/* AI Chat Widget - available on all pages */}
+    <AIChatWidget />
+  </>
   );
 };
 

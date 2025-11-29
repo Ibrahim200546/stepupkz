@@ -110,7 +110,7 @@ const Product = () => {
                 loading="lazy"
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800';
+                  e.currentTarget.src = '/placeholder-shoe.svg';
                 }}
               />
             </div>
@@ -124,7 +124,7 @@ const Product = () => {
                       loading="lazy"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400';
+                        e.currentTarget.src = '/placeholder-shoe.svg';
                       }}
                     />
                   </div>

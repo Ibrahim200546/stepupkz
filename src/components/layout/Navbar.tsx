@@ -65,7 +65,7 @@ const Navbar = () => {
             <LanguageSwitcher />
             
             <Button variant="ghost" size="icon" asChild className="hidden md:flex">
-              <Link to="/chat">
+              <Link to="/flick-login">
                 <MessageSquare className="h-5 w-5" />
               </Link>
             </Button>
@@ -145,7 +145,7 @@ const Navbar = () => {
                   </Link>
                   <hr className="my-2" />
                   <Link 
-                    to="/chat" 
+                    to="/flick-login" 
                     className="text-lg font-medium hover:text-primary transition-smooth flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >

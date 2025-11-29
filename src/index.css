@@ -68,6 +68,44 @@
   }
 }
 
+/* FlickMassege Styles */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-glass;
+  }
+  
+  .pixel-btn {
+    @apply font-pixel text-xs px-4 py-2 bg-flick-orange text-white shadow-pixel hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all active:translate-x-[4px] active:translate-y-[4px];
+  }
+
+  .pixel-input {
+    @apply font-sans bg-white/10 border-2 border-flick-blue/50 p-2 focus:outline-none focus:border-flick-orange transition-colors placeholder-white/50 text-white;
+  }
+}
+
+/* FlickMassege body background (only for /flick-chat route) */
+body.flick-theme {
+  @apply bg-flick-dark text-white overflow-hidden;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(0, 163, 255, 0.1) 0%, transparent 20%);
+}
+
+/* Custom Scrollbar for Flick */
+.flick-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flick-scroll::-webkit-scrollbar-track {
+  @apply bg-flick-dark;
+}
+
+.flick-scroll::-webkit-scrollbar-thumb {
+  @apply bg-flick-blue/50 rounded-full hover:bg-flick-orange/50 transition-colors;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

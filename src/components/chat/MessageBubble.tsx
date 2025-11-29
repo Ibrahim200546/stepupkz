@@ -5,6 +5,7 @@ import { ru } from 'date-fns/locale';
 import { Check, CheckCheck } from 'lucide-react';
 import { ImageWithLightbox } from '@/components/ui/image-with-lightbox';
 import { useState } from 'react';
+import { AudioPlayer } from './AudioPlayer';
 
 interface MessageBubbleProps {
   message: Message;
@@ -21,7 +22,9 @@ export const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
   const isRead = message.reads && message.reads.length > 0;
   
   const imageAttachments = message.attachments?.filter(a => a.type === 'image') || [];
-  const otherAttachments = message.attachments?.filter(a => a.type !== 'image') || [];
+  const voiceAttachments = message.attachments?.filter(a => a.type === 'voice') || [];
+  const stickerAttachments = message.attachments?.filter(a => a.type === 'sticker') || [];
+  const otherAttachments = message.attachments?.filter(a => !['image', 'voice', 'sticker'].includes(a.type)) || [];
 
   return (
     <div className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -38,6 +41,41 @@ export const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
         )}
         
         <div className="space-y-2">
+          {/* Stickers */}
+          {stickerAttachments.length > 0 && (
+            <div className="space-y-2">
+              {stickerAttachments.map((attachment, idx) => (
+                <img
+                  key={idx}
+                  src={attachment.url}
+                  alt="Sticker"
+                  className="w-32 h-32 object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1472491235688-bdc81a63246e?w=200&h=200&fit=crop';
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Voice Messages */}
+          {voiceAttachments.length > 0 && (
+            <div className="space-y-2">
+              {voiceAttachments.map((attachment, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-lg px-4 py-2 ${
+                    isOwn
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  }`}
+                >
+                  <AudioPlayer src={attachment.url} />
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Images */}
           {imageAttachments.length > 0 && (
             <div className={`grid gap-2 ${imageAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
@@ -62,7 +100,7 @@ export const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
           )}
 
           {/* Text content */}
-          {message.content && (
+          {message.content && !stickerAttachments.length && !voiceAttachments.length && (
             <div
               className={`rounded-lg px-4 py-2 ${
                 isOwn

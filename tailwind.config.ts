@@ -29,6 +29,12 @@ export default {
           foreground: "hsl(var(--secondary-foreground))",
           hover: "hsl(var(--secondary-hover))",
         },
+        // FlickMassege colors
+        'flick-orange': '#FF6B00',
+        'flick-blue': '#00A3FF',
+        'flick-dark': '#1A1A1A',
+        'flick-light': '#F5F5F5',
+        'flick-glass': 'rgba(255, 255, 255, 0.1)',
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -60,6 +66,12 @@ export default {
         'lg': 'var(--shadow-lg)',
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
+        // FlickMassege shadows
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'pixel': '4px 4px 0px 0px rgba(0,0,0,1)',
+      },
+      fontFamily: {
+        'pixel': ['"Press Start 2P"', 'cursive'],
       },
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',

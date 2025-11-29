@@ -7,6 +7,7 @@ import { useChatMessages } from '@/hooks/useChat';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { showNotification, requestNotificationPermission } from '@/lib/notificationSound';
 
 interface ChatWindowProps {
   chatId: string;
@@ -18,10 +19,37 @@ export const ChatWindow = ({ chatId, onBack }: ChatWindowProps) => {
   const { messages, loading, hasMore, sendMessage, markAsRead, loadMore } = useChatMessages(chatId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(messages.length);
+
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > prevMessagesLengthRef.current) {
+      const newMessage = messages[messages.length - 1];
+      if (newMessage.sender_id !== user?.id) {
+        const senderName = newMessage.sender
+          ? `${newMessage.sender.first_name || ''} ${newMessage.sender.last_name || ''}`.trim() || 'Пользователь'
+          : 'Пользователь';
+        
+        let notificationText = newMessage.content || '';
+        if (newMessage.attachments && newMessage.attachments.length > 0) {
+          const attachment = newMessage.attachments[0];
+          if (attachment.type === 'voice') notificationText = '🎤 Голосовое сообщение';
+          if (attachment.type === 'sticker') notificationText = '🎨 Стикер';
+          if (attachment.type === 'image') notificationText = '🖼️ Изображение';
+        }
+        
+        showNotification(`${senderName}`, notificationText);
+      }
+    }
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, user]);
 
   useEffect(() => {
     // Mark messages as read when viewing
