@@ -11,7 +11,7 @@
 
 Modern online shoe store with integrated messenger and admin panel
 
-[🌐 Demo](https://stepupkz.vercel.app) • [📚 Documentation](./docs/)
+[🌐 Demo](https://stepupshoes.pages.dev) • [📚 Documentation](./docs/)
 
 </div>
 
