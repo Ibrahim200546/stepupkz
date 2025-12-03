@@ -73,7 +73,17 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
             upsert: false,
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Upload error:', error);
+          
+          // Check if bucket doesn't exist
+          if (error.message?.includes('not found') || error.message?.includes('does not exist')) {
+            toast.error('Хранилище не настроено. Обратитесь к администратору.');
+            throw new Error('Storage bucket not configured');
+          }
+          
+          throw error;
+        }
 
         // Get public URL
         const { data: { publicUrl } } = supabase.storage
@@ -88,7 +98,8 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
         });
       } catch (error) {
         console.error('Error uploading file:', error);
-        toast.error(`Ошибка загрузки ${file.name}`);
+        const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+        toast.error(`Ошибка загрузки ${file.name}: ${errorMessage}`);
       }
     }
 
@@ -154,7 +165,16 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
           upsert: false,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Voice upload error:', error);
+        
+        if (error.message?.includes('not found') || error.message?.includes('does not exist')) {
+          toast.error('Хранилище не настроено. Обратитесь к администратору.');
+          throw new Error('Storage bucket not configured');
+        }
+        
+        throw error;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('chat-attachments')
@@ -170,7 +190,8 @@ export const MessageComposer = ({ chatId, onSend }: MessageComposerProps) => {
       onSend('Голосовое сообщение', [attachment]);
     } catch (error) {
       console.error('Error uploading voice message:', error);
-      toast.error('Ошибка загрузки голосового сообщения');
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      toast.error(`Ошибка загрузки: ${errorMessage}`);
     } finally {
       setUploading(false);
     }

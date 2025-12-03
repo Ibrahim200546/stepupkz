@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, BarChart3, MessageSquare, Store, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, BarChart3, TrendingUp, MessageSquare, Store, AlertTriangle } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -14,13 +14,13 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard, end: true },
+  { title: "Analysis", url: "/admin/analysis", icon: TrendingUp },
   { title: "Заказы", url: "/admin/orders", icon: ShoppingCart },
   { title: "Товары", url: "/admin/products", icon: Package },
   { title: "Пользователи", url: "/admin/users", icon: Users },
   { title: "Продавцы", url: "/admin/vendors", icon: Store },
   { title: "Чаты", url: "/admin/chats", icon: MessageSquare },
   { title: "Жалобы", url: "/admin/reports", icon: AlertTriangle },
-  { title: "Аналитика", url: "/admin/analytics", icon: BarChart3 },
   { title: "Настройки", url: "/admin/settings", icon: Settings },
 ];
 

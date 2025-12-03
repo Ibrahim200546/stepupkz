@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,8 +71,6 @@
 }
 
 /* FlickMassege Styles */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 @layer components {
   .glass-panel {
     @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-glass;

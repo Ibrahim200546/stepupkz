@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.local
+*.log
+.DS_Store
+dist-admin
+src/admin-panel
+slash-admin
+.wrangler
+*.md

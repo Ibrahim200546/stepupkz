@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 *.env
+FlickMassege
+SQL
+*.timestamp-*.mjs
+.vercel
+.env*.local

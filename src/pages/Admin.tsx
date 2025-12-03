@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Dashboard from "@/components/admin/Dashboard";
+import Analysis from "@/components/admin/Analysis";
 import OrdersManagement from "@/components/admin/OrdersManagement";
 import ProductsManagement from "@/components/admin/ProductsManagement";
 import UsersManagement from "@/components/admin/UsersManagement";
@@ -93,6 +94,7 @@ const Admin = () => {
     <AdminLayout>
       <Routes>
         <Route index element={<Dashboard />} />
+        <Route path="analysis" element={<Analysis />} />
         <Route path="orders" element={<OrdersManagement />} />
         <Route path="products" element={<ProductsManagement />} />
         <Route path="users" element={<UsersManagement />} />

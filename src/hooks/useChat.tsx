@@ -180,10 +180,20 @@ export const useChat = () => {
       }, () => {
         loadChats();
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Subscribed to chats updates');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Error subscribing to chats updates');
+        } else if (status === 'TIMED_OUT') {
+          console.error('⏱️ Subscription timed out');
+        }
+      });
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channel).catch(err => {
+        console.error('Error removing channel:', err);
+      });
     };
   }, [user, loadChats]);
 
@@ -343,12 +353,18 @@ export const useChatMessages = (chatId: string | null) => {
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          console.log('Subscribed to chat:', chatId);
+          console.log('✅ Subscribed to chat:', chatId);
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Error subscribing to chat:', chatId);
+        } else if (status === 'TIMED_OUT') {
+          console.error('⏱️ Chat subscription timed out:', chatId);
         }
       });
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channel).catch(err => {
+        console.error('Error removing chat channel:', err);
+      });
     };
   }, [chatId, user, messages]);
 

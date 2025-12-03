@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ShoppingBag, Users, DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 import SalesChart from "./SalesChart";
 import { Skeleton } from "@/components/ui/skeleton";
+import SettingsDrawer from "./SettingsDrawer";
 
 interface Stats {
   totalOrders: number;
@@ -141,9 +142,12 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Settings Drawer */}
+      <SettingsDrawer />
+      
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Обзор вашего магазина</p>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard - Workbench</h1>
+        <p className="text-muted-foreground">Полная аналитика и управление вашим магазином</p>
       </div>
 
       {/* Stats Cards */}
