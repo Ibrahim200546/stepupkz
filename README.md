@@ -12,6 +12,8 @@
 Современный интернет-магазин обуви с интегрированным мессенджером и админ-панелью
 
 [🌐 Демо](https://stepupkz.vercel.app/) • [📚 Документация](./docs/)
+<img width="413" height="416" alt="image" src="https://github.com/user-attachments/assets/b444f855-b168-475f-a05a-7a23922a8de3" />
+<img width="418" height="421" alt="image" src="https://github.com/user-attachments/assets/58840e0c-632f-4c85-ac51-1e75ccc6acef" />
 
 </div>
 
