@@ -115,5 +115,54 @@
       "title": "Contact Information",
       "text": "For questions about these terms, contact us:"
     }
+  },
+  "home": {
+    "heroTitle": "New Collection",
+    "heroSeason": "Season 2025",
+    "heroDescription": "Discover the perfect shoes for any occasion. Quality, comfort and style in every pair.",
+    "viewCatalog": "View Catalog",
+    "saleUpTo": "Sale up to -50%",
+    "modelsCount": "models",
+    "brandsCount": "brands",
+    "clientsCount": "clients",
+    "categoryTitle": "Shoe Categories",
+    "categoryDesc": "Find the perfect pair for any occasion",
+    "featured": "Featured Products",
+    "featuredDesc": "Best sellers this month",
+    "viewAll": "View all",
+    "viewAllProducts": "View all products",
+    "fastDelivery": "Fast Delivery",
+    "fastDeliveryDesc": "Delivery across Kazakhstan in 1-3 days",
+    "return30": "30 Days Return",
+    "return30Desc": "Easy return and exchange, no questions asked",
+    "onlinePayment": "Online Payment",
+    "onlinePaymentDesc": "Kaspi, cards, 0-0-12 installment"
+  },
+  "categories": {
+    "sneakers": "Sneakers",
+    "boots": "Boots",
+    "formal": "Formal",
+    "sandals": "Sandals",
+    "heels": "Heels",
+    "flats": "Flats",
+    "models": "models"
+  },
+  "product": {
+    "errorLoading": "Error loading product",
+    "selectSize": "Select size",
+    "notFound": "Product not found",
+    "backToCatalog": "Back to catalog",
+    "reviews": "reviews",
+    "description": "Description",
+    "characteristics": "Characteristics",
+    "material": "Material",
+    "color": "Color",
+    "season": "Season",
+    "size": "Size",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "discount": "Discount"
   }
 }

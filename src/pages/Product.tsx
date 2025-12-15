@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingCart, Heart, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import type { Product as ProductType } from "@/types/database";
 
 interface ProductWithDetails extends ProductType {
@@ -18,6 +19,7 @@ interface ProductWithDetails extends ProductType {
 
 const Product = () => {
   const { id } = useParams();
+  const { t } = useTranslation();
   const { addToCart } = useCart();
   const [product, setProduct] = useState<ProductWithDetails | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
@@ -52,7 +54,7 @@ const Product = () => {
       }
     } catch (error) {
       console.error('Error loading product:', error);
-      toast.error('Ошибка загрузки товара');
+      toast.error(t('product.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ const Product = () => {
 
   const handleAddToCart = async () => {
     if (!selectedVariant) {
-      toast.error('Выберите размер');
+      toast.error(t('product.selectSize'));
       return;
     }
     await addToCart(selectedVariant);
@@ -80,9 +82,9 @@ const Product = () => {
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Товар не найден</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('product.notFound')}</h2>
             <Button asChild>
-              <Link to="/catalog">Вернуться в каталог</Link>
+              <Link to="/catalog">{t('product.backToCatalog')}</Link>
             </Button>
           </div>
         </div>
@@ -146,7 +148,7 @@ const Product = () => {
                       <Star key={star} className="h-4 w-4 fill-primary text-primary" />
                     ))}
                   </div>
-                  <span className="text-sm text-muted-foreground">(45 отзывов)</span>
+                  <span className="text-sm text-muted-foreground">(45 {t('product.reviews')})</span>
                 </div>
               </div>
 
@@ -164,7 +166,7 @@ const Product = () => {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-3">Выберите размер:</h3>
+              <h3 className="font-semibold mb-3">{t('product.selectSize')}:</h3>
               <div className="grid grid-cols-4 gap-2">
                 {product.product_variants?.map((variant) => (
                   <Button
@@ -186,7 +188,7 @@ const Product = () => {
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                В корзину
+                {t('product.addToCart')}
               </Button>
               <Button size="lg" variant="outline">
                 <Heart className="h-5 w-5" />
@@ -194,7 +196,7 @@ const Product = () => {
             </div>
 
             <div className="border-t pt-6">
-              <h3 className="font-semibold mb-3">Описание</h3>
+              <h3 className="font-semibold mb-3">{t('product.description')}</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {product.description}
               </p>
@@ -202,12 +204,12 @@ const Product = () => {
 
             <div className="border-t pt-6 space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Артикул:</span>
+                <span className="text-muted-foreground">SKU:</span>
                 <span className="font-medium">{product.sku}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Наличие:</span>
-                <span className="font-medium text-green-600">В наличии</span>
+                <span className="text-muted-foreground">{t('product.inStock')}:</span>
+                <span className="font-medium text-green-600">{t('product.inStock')}</span>
               </div>
             </div>
           </div>

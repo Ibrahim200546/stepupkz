@@ -115,5 +115,54 @@
       "title": "6. Контакты",
       "text": "По всем вопросам обращайтесь:"
     }
+  },
+  "home": {
+    "heroTitle": "Новая коллекция",
+    "heroSeason": "сезона 2025",
+    "heroDescription": "Откройте для себя идеальную обувь для любого случая. Качество, комфорт и стиль в каждой паре.",
+    "viewCatalog": "Смотреть каталог",
+    "saleUpTo": "Распродажа до -50%",
+    "modelsCount": "моделей",
+    "brandsCount": "брендов",
+    "clientsCount": "клиентов",
+    "categoryTitle": "Категории обуви",
+    "categoryDesc": "Найдите идеальную пару для любого случая",
+    "featured": "Популярные товары",
+    "featuredDesc": "Хиты продаж этого месяца",
+    "viewAll": "Смотреть все",
+    "viewAllProducts": "Смотреть все товары",
+    "fastDelivery": "Быстрая доставка",
+    "fastDeliveryDesc": "Доставка по Казахстану за 1-3 дня",
+    "return30": "Возврат 30 дней",
+    "return30Desc": "Легкий возврат и обмен без вопросов",
+    "onlinePayment": "Оплата онлайн",
+    "onlinePaymentDesc": "Kaspi, карты, рассрочка 0-0-12"
+  },
+  "categories": {
+    "sneakers": "Кроссовки",
+    "boots": "Ботинки",
+    "formal": "Классика",
+    "sandals": "Сандалии",
+    "heels": "Каблуки",
+    "flats": "Балетки",
+    "models": "моделей"
+  },
+  "product": {
+    "errorLoading": "Ошибка загрузки товара",
+    "selectSize": "Выберите размер",
+    "notFound": "Товар не найден",
+    "backToCatalog": "Вернуться в каталог",
+    "reviews": "отзывов",
+    "description": "Описание",
+    "characteristics": "Характеристики",
+    "material": "Материал",
+    "color": "Цвет",
+    "season": "Сезон",
+    "size": "Размер",
+    "addToCart": "Добавить в корзину",
+    "buyNow": "Купить сейчас",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии",
+    "discount": "Скидка"
   }
 }

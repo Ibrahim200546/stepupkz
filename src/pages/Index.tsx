@@ -6,6 +6,7 @@ import ProductCard from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
@@ -51,6 +52,8 @@ const featuredProducts = [
 ];
 
 const Index = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -63,12 +66,12 @@ const Index = () => {
         <section className="container mx-auto px-4 py-16">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Популярные товары</h2>
-              <p className="text-muted-foreground">Хиты продаж этого месяца</p>
+              <h2 className="text-3xl font-bold mb-2">{t('home.featured')}</h2>
+              <p className="text-muted-foreground">{t('home.featuredDesc')}</p>
             </div>
             <Button variant="outline" asChild className="hidden md:flex">
               <Link to="/catalog">
-                Смотреть все
+                {t('home.viewAll')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -83,7 +86,7 @@ const Index = () => {
           <div className="mt-8 text-center md:hidden">
             <Button variant="outline" asChild className="w-full">
               <Link to="/catalog">
-                Смотреть все товары
+                {t('home.viewAllProducts')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -96,23 +99,23 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center space-y-2">
                 <div className="text-4xl mb-4">🚚</div>
-                <h3 className="font-semibold text-lg">Быстрая доставка</h3>
+                <h3 className="font-semibold text-lg">{t('home.fastDelivery')}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Доставка по Казахстану за 1-3 дня
+                  {t('home.fastDeliveryDesc')}
                 </p>
               </div>
               <div className="text-center space-y-2">
                 <div className="text-4xl mb-4">↩️</div>
-                <h3 className="font-semibold text-lg">Возврат 30 дней</h3>
+                <h3 className="font-semibold text-lg">{t('home.return30')}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Легкий возврат и обмен без вопросов
+                  {t('home.return30Desc')}
                 </p>
               </div>
               <div className="text-center space-y-2">
                 <div className="text-4xl mb-4">💳</div>
-                <h3 className="font-semibold text-lg">Оплата онлайн</h3>
+                <h3 className="font-semibold text-lg">{t('home.onlinePayment')}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Kaspi, карты, рассрочка 0-0-12
+                  {t('home.onlinePaymentDesc')}
                 </p>
               </div>
             </div>
