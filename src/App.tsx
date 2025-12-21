@@ -87,6 +87,7 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      {/* Snowfall effect for winter season */}
       <Snowfall 
         color="#82C3D9" 
         snowflakeCount={200}
