@@ -8,6 +8,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import { CartProvider } from "./hooks/useCart";
 import { usePresence } from "./hooks/usePresence";
 import SEOHead from "./components/SEOHead";
+import Snowfall from "react-snowfall";
 import "./i18n";
 
 // Lazy load pages for code splitting
@@ -86,6 +87,17 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Snowfall 
+        color="#82C3D9" 
+        snowflakeCount={200}
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          pointerEvents: 'none'
+        }}
+      />
       <Toaster />
       <Sonner />
       <BrowserRouter>
