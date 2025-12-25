@@ -45,8 +45,11 @@ const Catalog = () => {
 
   useEffect(() => {
     loadProducts();
-    loadBrands();
   }, [searchQuery]);
+
+  useEffect(() => {
+    loadBrands();
+  }, []);
 
   const loadBrands = async () => {
     try {
@@ -132,8 +135,11 @@ const Catalog = () => {
       }
 
       // Фильтр по бренду
-      if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-        return false;
+      if (selectedBrands.length > 0) {
+        // Check if product has a brand and it matches selected brands
+        if (!product.brand || !selectedBrands.includes(product.brand)) {
+          return false;
+        }
       }
 
       // Фильтр по размеру (примечание: у продуктов нет размера в данной модели)

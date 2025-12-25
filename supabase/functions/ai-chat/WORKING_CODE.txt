@@ -1,0 +1,64 @@
+// РАБОЧИЙ КОД - СКОПИРУЙТЕ В SUPABASE DASHBOARD
+// https://supabase.com/dashboard/project/uoziiapuqunqbvevfzyu/functions/ai-chat
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+Deno.serve(async (req) => {
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { message } = await req.json();
+    console.log('Received message:', message);
+
+    // Mock AI responses
+    const responses = {
+      'привет': 'Здравствуйте! Добро пожаловать в StepUp Shoes! 👟 Чем могу помочь?',
+      'доставка': 'Доставка по всему Казахстану занимает 2-5 дней. Бесплатная доставка при заказе от 50,000₸!',
+      'оплата': 'Принимаем оплату картой, наличными при получении, или через Kaspi Pay! 💳',
+      'возврат': 'Возврат товара возможен в течение 30 дней с момента покупки. Обувь должна быть в отличном состоянии.',
+      'размер': 'Помогу подобрать размер! У нас есть таблица размеров и детальные описания к каждой модели.',
+      'default': 'Спасибо за ваш вопрос! Я AI-помощник StepUp Shoes. Могу помочь с выбором обуви, доставкой, оплатой или возвратом. Что вас интересует?'
+    };
+
+    // Find matching response
+    let botMessage = responses.default;
+    const lowerMessage = message.toLowerCase();
+    
+    for (const [key, value] of Object.entries(responses)) {
+      if (lowerMessage.includes(key)) {
+        botMessage = value;
+        break;
+      }
+    }
+
+    console.log('Sending response:', botMessage);
+
+    return new Response(
+      JSON.stringify({ message: botMessage }), 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      }
+    );
+
+  } catch (error) {
+    console.error('Error:', error);
+    
+    return new Response(
+      JSON.stringify({ 
+        message: 'Здравствуйте! Я AI-помощник StepUp Shoes. Чем могу помочь? 😊',
+        error: error.message
+      }), 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      }
+    );
+  }
+});
