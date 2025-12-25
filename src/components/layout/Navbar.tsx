@@ -1,12 +1,12 @@
-import { ShoppingCart, Search, User, Menu, LogOut, MessageSquare, X } from "lucide-react";
+import { ShoppingCart, User, Menu, LogOut, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import { SearchBar } from "@/components/search/SearchBar";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -33,14 +33,7 @@ const Navbar = () => {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder={t('nav.search')}
-                className="pl-10 w-full"
-              />
-            </div>
+            <SearchBar placeholder={t('nav.search')} className="w-full" />
           </div>
 
           {/* Desktop Navigation */}
@@ -190,14 +183,7 @@ const Navbar = () => {
 
         {/* Mobile Search */}
         <div className="md:hidden pb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t('nav.search')}
-              className="pl-10 w-full"
-            />
-          </div>
+          <SearchBar placeholder={t('nav.search')} className="w-full" />
         </div>
       </div>
     </header>

@@ -63,8 +63,8 @@ const Index = () => {
         <CategorySection />
         
         {/* Featured Products Section */}
-        <section className="container mx-auto px-4 py-16">
-          <div className="flex justify-between items-center mb-8">
+        <section className="container mx-auto px-4 py-8 sm:py-16 overflow-x-hidden">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
             <div>
               <h2 className="text-3xl font-bold mb-2">{t('home.featured')}</h2>
               <p className="text-muted-foreground">{t('home.featuredDesc')}</p>
@@ -77,7 +77,7 @@ const Index = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}

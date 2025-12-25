@@ -1,131 +1,109 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Heart, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useCart } from "@/hooks/useCart";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useState } from "react";
+import { Link } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart, Heart } from 'lucide-react';
+import { ResponsiveImage } from '@/components/ui/responsive-image';
 
 interface ProductCardProps {
-  id: string | number;
+  id: string;
   name: string;
   brand: string;
   price: number;
   oldPrice?: number;
   image: string;
-  inStock: boolean;
+  inStock?: boolean;
 }
 
-const ProductCard = ({ id, name, brand, price, oldPrice, image, inStock }: ProductCardProps) => {
-  const discount = oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
-  const { addToCart } = useCart();
-  const [adding, setAdding] = useState(false);
+const ProductCard = ({
+  id,
+  name,
+  brand,
+  price,
+  oldPrice,
+  image,
+  inStock = true,
+}: ProductCardProps) => {
+  const discount = oldPrice
+    ? Math.round(((oldPrice - price) / oldPrice) * 100)
+    : 0;
 
   return (
-    <Card className="group relative overflow-hidden border bg-card hover:shadow-card-hover transition-smooth">
-      <Link to={`/product/${id}`} className="block">
-        {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          <img 
-            src={image} 
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 w-full max-w-full">
+      <Link to={`/product/${id}`}>
+        <div className="relative aspect-square overflow-hidden bg-muted w-full">
+          <ResponsiveImage
+            src={image}
             alt={name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder-shoe.svg';
-            }}
+            className="group-hover:scale-105 transition-transform duration-300 w-full h-full"
           />
           
-          {/* Discount Badge */}
           {discount > 0 && (
-            <div className="absolute top-3 left-3 bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-semibold">
+            <Badge 
+              variant="destructive" 
+              className="absolute top-2 left-2 z-10"
+            >
               -{discount}%
-            </div>
+            </Badge>
           )}
 
-          {/* Stock Status */}
           {!inStock && (
-            <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-              <span className="text-lg font-semibold text-muted-foreground">Нет в наличии</span>
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <Badge variant="secondary">Нет в наличии</Badge>
             </div>
           )}
 
-          {/* Wishlist Button */}
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="absolute top-3 right-3 bg-background/80 hover:bg-background opacity-0 group-hover:opacity-100 transition-smooth"
-            onClick={(e) => {
-              e.preventDefault();
-              // TODO: Add to wishlist
-            }}
-          >
-            <Heart className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Product Info */}
-        <div className="p-4 space-y-2">
-          <div className="text-sm text-muted-foreground">{brand}</div>
-          <h3 className="font-semibold line-clamp-2 min-h-[2.5rem]">{name}</h3>
-          
-          {/* Price */}
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-foreground">
-              {price.toLocaleString('ru-KZ')} ₸
-            </span>
-            {oldPrice && (
-              <span className="text-sm text-muted-foreground line-through">
-                {oldPrice.toLocaleString('ru-KZ')} ₸
-              </span>
-            )}
+          {/* Quick actions */}
+          <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 rounded-full"
+              onClick={(e) => {
+                e.preventDefault();
+                // TODO: Add to wishlist
+              }}
+            >
+              <Heart className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+
+        <CardContent className="p-3 sm:p-4">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">
+            {brand}
+          </p>
+          <h3 className="font-semibold text-sm sm:text-base mb-2 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem]">
+            {name}
+          </h3>
+
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-lg font-bold">
+                {price.toLocaleString('ru-KZ')} ₸
+              </span>
+              {oldPrice && (
+                <span className="text-xs sm:text-sm text-muted-foreground line-through">
+                  {oldPrice.toLocaleString('ru-KZ')} ₸
+                </span>
+              )}
+            </div>
+
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-full flex-shrink-0"
+              onClick={(e) => {
+                e.preventDefault();
+                // TODO: Add to cart
+              }}
+              disabled={!inStock}
+            >
+              <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        </CardContent>
       </Link>
-
-      {/* Add to Cart Button */}
-      {inStock && (
-        <div className="p-4 pt-0">
-          <Button 
-            className="w-full" 
-            variant="outline"
-            disabled={adding}
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              setAdding(true);
-              try {
-                // Get first available variant for this product
-                const { data: variants, error } = await supabase
-                  .from('product_variants')
-                  .select('id')
-                  .eq('product_id', id)
-                  .gt('stock', 0) // Get variants with stock > 0
-                  .limit(1);
-
-                if (error) throw error;
-
-                if (variants && variants.length > 0) {
-                  await addToCart(variants[0].id);
-                  toast.success('Товар добавлен в корзину');
-                } else {
-                  toast.error('Товар временно недоступен');
-                }
-              } catch (error) {
-                console.error('Error adding to cart:', error);
-                toast.error('Не удалось добавить в корзину');
-              } finally {
-                setAdding(false);
-              }
-            }}
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            {adding ? 'Добавление...' : 'В корзину'}
-          </Button>
-        </div>
-      )}
     </Card>
   );
 };

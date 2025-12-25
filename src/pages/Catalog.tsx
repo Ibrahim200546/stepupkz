@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/products/ProductCard";
@@ -8,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types/database";
 
 interface CatalogProduct {
@@ -22,6 +24,7 @@ interface CatalogProduct {
 }
 
 const Catalog = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [priceRange, setPriceRange] = useState([0, 100000]);
@@ -29,37 +32,90 @@ const Catalog = () => {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('popular');
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 10;
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [availableBrands, setAvailableBrands] = useState<string[]>([]);
+  const productsPerPage = 12;
+
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     loadProducts();
-  }, []);
+    loadBrands();
+  }, [searchQuery]);
+
+  const loadBrands = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('brands')
+        .select('name')
+        .order('name');
+
+      if (error) throw error;
+      setAvailableBrands(data?.map(b => b.name) || []);
+    } catch (error) {
+      console.error('Error loading brands:', error);
+    }
+  };
 
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          brand:brands(name),
-          product_images(url)
-        `)
-        .eq('is_active', true);
 
-      if (error) throw error;
+      // Use RPC function for search if query exists
+      if (searchQuery.trim()) {
+        const { data, error } = await supabase.rpc('search_products', {
+          search_query: searchQuery.trim(),
+          min_price: 0,
+          max_price: 999999999,
+          brand_ids: null,
+          category_ids: null,
+          limit_count: 100,
+          offset_count: 0,
+        });
 
-      const formattedProducts = data?.map((product) => ({
-        id: product.id,
-        name: product.name,
-        brand: product.brand?.name || '',
-        price: parseFloat(product.price),
-        oldPrice: product.old_price ? parseFloat(product.old_price) : undefined,
-        image: product.product_images[0]?.url || '',
-        inStock: true,
-      })) || [];
+        if (error) throw error;
 
-      setProducts(formattedProducts);
+        const formattedProducts = data?.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          brand: product.brand_name || '',
+          price: parseFloat(product.price),
+          oldPrice: product.old_price ? parseFloat(product.old_price) : undefined,
+          image: product.image_url || '',
+          inStock: true,
+        })) || [];
+
+        setProducts(formattedProducts);
+      } else {
+        // Regular query without search
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            *,
+            brand:brands(name),
+            product_images(url)
+          `)
+          .eq('is_active', true);
+
+        if (error) throw error;
+
+        const formattedProducts = data?.map((product) => ({
+          id: product.id,
+          name: product.name,
+          brand: product.brand?.name || '',
+          price: parseFloat(product.price),
+          oldPrice: product.old_price ? parseFloat(product.old_price) : undefined,
+          image: product.product_images[0]?.url || '',
+          inStock: true,
+        })) || [];
+
+        setProducts(formattedProducts);
+      }
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
@@ -128,10 +184,10 @@ const Catalog = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex gap-8">
+      <main className="flex-1 container mx-auto px-4 py-8 overflow-x-hidden">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8">
           {/* Filters Sidebar */}
-          <aside className="hidden md:block w-64 space-y-6">
+          <aside className="hidden md:block md:w-64 space-y-6 flex-shrink-0">
             <div>
               <h3 className="font-semibold mb-4">Цена</h3>
               <Slider
@@ -149,8 +205,8 @@ const Catalog = () => {
 
             <div>
               <h3 className="font-semibold mb-4">Бренд</h3>
-              <div className="space-y-2">
-                {['Nike', 'Adidas', 'Puma', 'Reebok'].map(brand => (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {availableBrands.map(brand => (
                   <div key={brand} className="flex items-center space-x-2">
                     <Checkbox 
                       id={brand}
@@ -182,10 +238,30 @@ const Catalog = () => {
 
           {/* Products Grid */}
           <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Каталог обуви</h1>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-2xl font-bold">Каталог обуви</h1>
+                {searchQuery && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-sm text-muted-foreground">
+                      Поиск: "{searchQuery}"
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchParams({});
+                      }}
+                      className="h-6 px-2"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+              </div>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -203,7 +279,7 @@ const Catalog = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {filteredProducts
                     .slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
                     .map((product) => (

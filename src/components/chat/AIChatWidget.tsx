@@ -1,16 +1,31 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, X, Minimize2, Maximize2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Bot, Send, X, Minimize2, Maximize2, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+interface ProductRecommendation {
+  id: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  brand: string;
+  category: string;
+  image: string;
+  description: string;
+  reason: string;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  products?: ProductRecommendation[];
 }
 
 export const AIChatWidget = () => {
@@ -47,14 +62,10 @@ export const AIChatWidget = () => {
     setLoading(true);
 
     try {
-      // Call Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('ai-chat', {
+      // Call AI Product Recommendations Edge Function
+      const { data, error } = await supabase.functions.invoke('ai-product-recommendations', {
         body: {
           message: input,
-          conversationHistory: messages.slice(-5).map(m => ({
-            role: m.role,
-            content: m.content
-          }))
         }
       });
 
@@ -67,6 +78,7 @@ export const AIChatWidget = () => {
         role: 'assistant',
         content: data.message || 'Извините, не удалось получить ответ.',
         timestamp: new Date(),
+        products: data.products || [],
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -99,18 +111,20 @@ export const AIChatWidget = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg z-50"
         size="icon"
       >
-        <Bot className="h-6 w-6" />
+        <Bot className="h-5 w-5 md:h-6 md:w-6" />
       </Button>
     );
   }
 
   return (
     <Card 
-      className={`fixed bottom-6 right-6 shadow-2xl z-50 flex flex-col transition-all ${
-        isMinimized ? 'h-14 w-80' : 'h-[600px] w-96'
+      className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 shadow-2xl z-50 flex flex-col transition-all ${
+        isMinimized 
+          ? 'h-14 w-[280px] sm:w-80' 
+          : 'h-[500px] w-[calc(100vw-2rem)] sm:w-96 max-w-[400px]'
       }`}
     >
       {/* Header */}
@@ -154,25 +168,95 @@ export const AIChatWidget = () => {
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
+                <div key={idx}>
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-2`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {msg.timestamp.toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {msg.timestamp.toLocaleTimeString('ru-RU', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Product Recommendations */}
+                  {msg.products && msg.products.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {msg.products.map((product) => {
+                        const discount = product.oldPrice
+                          ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+                          : 0;
+
+                        return (
+                          <Link
+                            key={product.id}
+                            to={`/product/${product.id}`}
+                            className="block"
+                          >
+                            <Card className="p-3 hover:shadow-md transition-shadow">
+                              <div className="flex gap-3">
+                                <div className="w-20 h-20 flex-shrink-0 bg-muted rounded overflow-hidden">
+                                  <img
+                                    src={product.image || '/placeholder-shoe.svg'}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                    onError={(e) => {
+                                      e.currentTarget.src = '/placeholder-shoe.svg';
+                                    }}
+                                  />
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-medium text-sm truncate">{product.name}</p>
+                                      <p className="text-xs text-muted-foreground">{product.brand}</p>
+                                    </div>
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 flex-shrink-0">
+                                      <ShoppingCart className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="font-semibold text-sm">
+                                      {product.price.toLocaleString('ru-KZ')} ₸
+                                    </span>
+                                    {discount > 0 && (
+                                      <>
+                                        <span className="text-xs text-muted-foreground line-through">
+                                          {product.oldPrice!.toLocaleString('ru-KZ')} ₸
+                                        </span>
+                                        <Badge variant="destructive" className="text-xs px-1 py-0">
+                                          -{discount}%
+                                        </Badge>
+                                      </>
+                                    )}
+                                  </div>
+
+                                  {product.category && (
+                                    <Badge variant="outline" className="text-xs mt-1">
+                                      {product.category}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               ))}
               
